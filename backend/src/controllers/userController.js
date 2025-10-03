@@ -85,13 +85,75 @@ export async function acceptFriendRequest(req, res) {
       return res.status(404).json({ message: "Friend request not found" });
     }
 
+    //Verify that the logged-in user is the recipient of the friend request
     if (friendRequest.recipient.toString() !== req.user.id) {
       return res
         .status(403)
         .json({ message: "You are not authorized to accept this request" });
     }
+
+    friendRequest.status = "accepted";
+    await friendRequest.save();
+
+    // Add each user to the other's friends list
+
+    await User.findByIdAndUpdate(req.user.id, {
+      $addToSet: { friends: friendRequest.sender },
+    });
+    await User.findByIdAndUpdate(friendRequest.sender, {
+      $addToSet: { friends: friendRequest.recipient },
+    });
+
+    res.status(200).json({ message: "Friend request accepted" });
   } catch (error) {
     console.error("Error accepting friend request:", error);
+    res.status(500).json({ message: error.message });
+  }
+}
+
+export async function getPendingFriendRequests(req, res) {
+  try {
+    const pendingRequests = await FriendRequest.find({
+      recipient: req.user.id,
+      status: "pending",
+    }).populate("sender", "fullName profilePic");
+
+    const acceptedRequest = await FriendRequest.find({
+      recipient: req.user.id,
+      status: "accepted",
+    }).populate("sender", "fullName profilePic");
+
+    res.status(200).json({ pendingRequests, acceptedRequest });
+  } catch (error) {
+    console.error("Error fetching pending friend requests:", error);
+    res.status(500).json({ message: error.message });
+  }
+}
+
+export async function getOutgoingFriendRequests(req,res){
+  try {
+    const outgoingRequests = await FriendRequest.find({
+      sender: req.user.id,
+      status: "pending",
+    }).populate("recipient", "fullName profilePic");
+
+    res.status(200).json(outgoingRequests);
+  } catch (error) {
+    console.error("Error fetching outgoing friend requests:", error);
+    res.status(500).json({ message: error.message });
+  }
+}
+
+export async function getAcceptedFriendRequests(req,res) {
+  try {
+    const acceptedRequests = await FriendRequest.find({
+      recipient: req.user.id,
+      status: "accepted",
+    }).populate("sender", "fullName profilePic");
+
+    res.status(200).json(acceptedRequests);
+  } catch (error) {
+    console.error("Error fetching accepted friend requests:", error);
     res.status(500).json({ message: error.message });
   }
 }
