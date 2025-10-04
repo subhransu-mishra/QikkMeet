@@ -7,13 +7,19 @@ import { connectDB } from "./lib/db.js";
 import userRoutes from "./routes/userRoute.js";
 import chatRoutes from "./routes/chatRoute.js";
 
-const app = express();
-app.use(cors());
-app.use(cookieParser());
 const PORT = process.env.PORT || 5001;
-
 dotenv.config();
-// app.use(cors());
+
+const app = express();
+
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+    credentials: true,
+  })
+);
+
+app.use(cookieParser());
 app.use(express.json());
 app.get("/", (req, res) => {
   res.send("Home Route");
