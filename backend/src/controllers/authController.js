@@ -69,6 +69,9 @@ export const signup = async (req, res) => {
         email: newUser.email,
         fullName: newUser.fullName,
         profilePic: newUser.profilePic,
+        bio: newUser.bio,
+        location: newUser.location,
+        isOnboarded: newUser.isOnboarded,
       },
     });
   } catch (error) {
@@ -108,6 +111,9 @@ export const login = async (req, res) => {
         email: user.email,
         fullName: user.fullName,
         profilePic: user.profilePic,
+        bio: user.bio,
+        location: user.location,
+        isOnboarded: user.isOnboarded,
       },
     });
     console.log("User logged in:", user._id);

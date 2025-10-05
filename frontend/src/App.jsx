@@ -11,37 +11,39 @@ import { Toaster } from "react-hot-toast";
 import { useQuery } from "@tanstack/react-query";
 import { axiosInstance } from "./lib/axios";
 const App = () => {
-  const [authChecked, setAuthChecked] = useState(false);
   const {
     data: authData,
     isLoading,
-    error,
+    isError,
   } = useQuery({
     queryKey: ["authUser"],
     queryFn: async () => {
       try {
-        const response = await axiosInstance.get("/auth/me");
-        return response.data;
+        const res = await axiosInstance.get("/auth/me");
+        return res.data;
       } catch (error) {
         if (error.response?.status === 401) {
+          localStorage.removeItem("token");
           return { user: null };
         }
         throw error;
       }
     },
-    retry: false, //auth check only once
+    retry: false,
     refetchOnWindowFocus: false,
-    onSettled: () => {
-      setAuthChecked(true);
-    },
   });
 
-  // Show loading state only on initial auth check
-  if (isLoading && !authChecked) return <div>Loading...</div>;
+  if (isLoading)
+    return (
+      <div className="h-screen flex items-center justify-center text-white">
+        Loading...
+      </div>
+    );
 
   const authUser = authData?.user;
+
   return (
-    <div className="h-screen">
+    <div className="h-screen bg-primary text-white">
       <Routes>
         <Route
           path="/"
@@ -55,7 +57,10 @@ const App = () => {
           path="/signup"
           element={!authUser ? <SignUpPage /> : <Navigate to="/" />}
         />
-        <Route path="/onboarding" element={<OnBoardingPage />} />
+        <Route
+          path="/onboarding"
+          element={authUser ? <OnBoardingPage /> : <Navigate to="/login" />}
+        />
         <Route
           path="/notifications"
           element={!authUser ? <NotificationPage /> : <Navigate to="/login" />}
@@ -69,7 +74,15 @@ const App = () => {
           element={!authUser ? <ChatPage /> : <Navigate to="/login" />}
         />
       </Routes>
-      <Toaster />
+      <Toaster
+        toastOptions={{
+          style: {
+            background: "#2a2a2a",
+            color: "#fff",
+            border: "1px solid #7950be",
+          },
+        }}
+      />
     </div>
   );
 };

@@ -1,1 +1,17 @@
 @import "tailwindcss";
+
+
+@layer base {
+  * {
+    color: white;
+  }
+
+  body {
+    background-color: #212121;
+    color: white;
+  }
+
+  input::placeholder {
+    color: #9ca3af;
+  }
+}
