@@ -4,6 +4,7 @@ import { FaEye, FaEyeSlash, FaEnvelope, FaLock } from "react-icons/fa";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { axiosInstance } from "../lib/axios";
 import toast from "react-hot-toast";
+import { LoadingSpinner } from "../components/ui/LoadingSpinner";
 
 const LoginPage = () => {
   const navigate = useNavigate();
@@ -124,7 +125,7 @@ const LoginPage = () => {
               <div className="text-right">
                 <Link
                   to="/forgot-password"
-                  className="text-sm text-secondary hover:underline transition-colors duration-200"
+                  className="text-sm cursor-pointer text-secondary hover:underline transition-colors duration-200"
                 >
                   Forgot your password?
                 </Link>
@@ -134,7 +135,7 @@ const LoginPage = () => {
               <button
                 type="submit"
                 disabled={isLoading}
-                className={`w-full py-3 px-6 rounded-full font-semibold text-white transition-all duration-300
+                className={`w-full py-3 px-6 rounded-full font-semibold text-white transition-all duration-300 relative
                   ${
                     isLoading
                       ? "bg-gray-500 cursor-not-allowed"
@@ -143,10 +144,7 @@ const LoginPage = () => {
                   shadow-lg hover:shadow-secondary/40 focus:outline-none focus:ring-4 focus:ring-secondary/40`}
               >
                 {isLoading ? (
-                  <div className="flex items-center justify-center gap-3">
-                    <div className="w-6 h-6 border-3 border-white border-t-transparent rounded-full animate-spin"></div>
-                    <span>Signing In...</span>
-                  </div>
+                  <LoadingSpinner text="Signing In..." size="md" />
                 ) : (
                   "Sign In"
                 )}
@@ -208,7 +206,7 @@ const LoginPage = () => {
                 Don't have an account?{" "}
                 <Link
                   to="/signup"
-                  className="text-secondary hover:underline font-semibold transition-colors duration-200"
+                  className="text-secondary cursor-pointer hover:underline font-semibold transition-colors duration-200"
                 >
                   Sign Up
                 </Link>

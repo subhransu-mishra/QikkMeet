@@ -10,6 +10,8 @@ import ChatPage from "./pages/ChatPage";
 import { Toaster } from "react-hot-toast";
 import { useQuery } from "@tanstack/react-query";
 import { axiosInstance } from "./lib/axios";
+import { LoadingSpinner } from "./components/ui/LoadingSpinner";
+
 const App = () => {
   const {
     data: authData,
@@ -35,8 +37,10 @@ const App = () => {
 
   if (isLoading)
     return (
-      <div className="h-screen flex items-center justify-center text-white">
-        Loading...
+      <div className="h-screen bg-primary flex items-center justify-center text-white">
+        <div className="flex flex-col items-center gap-4">
+          <LoadingSpinner text="Loading..." size="xl" showText={true} />
+        </div>
       </div>
     );
 

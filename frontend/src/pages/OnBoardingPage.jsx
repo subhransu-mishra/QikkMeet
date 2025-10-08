@@ -4,6 +4,7 @@ import { FaUser, FaMapMarkerAlt, FaFileAlt, FaRandom } from "react-icons/fa";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { axiosInstance } from "../lib/axios";
 import toast from "react-hot-toast";
+import { LoadingSpinner } from "../components/ui/LoadingSpinner";
 
 const OnBoardingPage = () => {
   const navigate = useNavigate();
@@ -272,10 +273,7 @@ const OnBoardingPage = () => {
                 shadow-lg hover:shadow-secondary/40 focus:outline-none focus:ring-4 focus:ring-secondary/40`}
             >
               {isLoading ? (
-                <div className="flex items-center justify-center gap-3">
-                  <div className="w-6 h-6 border-3 border-white border-t-transparent rounded-full animate-spin"></div>
-                  <span>Completing Onboarding...</span>
-                </div>
+                <LoadingSpinner text="Completing Onboarding..." size="md" />
               ) : (
                 "Complete Onboarding"
               )}

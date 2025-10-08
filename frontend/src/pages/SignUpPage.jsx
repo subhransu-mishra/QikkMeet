@@ -11,6 +11,7 @@ import {
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { axiosInstance } from "../lib/axios";
 import toast from "react-hot-toast";
+import { LoadingSpinner } from "../components/ui/LoadingSpinner";
 
 const SignUpPage = () => {
   const navigate = useNavigate();
@@ -238,7 +239,7 @@ const SignUpPage = () => {
               <button
                 type="submit"
                 disabled={isLoading}
-                className={`w-full py-3 px-6 rounded-full font-semibold text-white transition-all duration-300
+                className={`w-full py-3 px-6 rounded-full font-semibold text-white transition-all duration-300 relative
                   ${
                     isLoading
                       ? "bg-gray-500 cursor-not-allowed"
@@ -247,10 +248,7 @@ const SignUpPage = () => {
                   shadow-lg hover:shadow-secondary/40 focus:outline-none focus:ring-4 focus:ring-secondary/40`}
               >
                 {isLoading ? (
-                  <div className="flex items-center justify-center gap-3">
-                    <div className="w-6 h-6 border-3 border-white border-t-transparent rounded-full animate-spin"></div>
-                    <span>Creating Account...</span>
-                  </div>
+                  <LoadingSpinner text="Creating Account..." size="md" />
                 ) : (
                   "Sign Up"
                 )}
