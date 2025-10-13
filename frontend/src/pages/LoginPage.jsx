@@ -162,7 +162,7 @@ const LoginPage = () => {
             <div className="mt-6 space-y-3">
               <button
                 type="button"
-                className="w-full flex items-center justify-center gap-3 py-3 px-4 border border-gray-600 rounded-2xl text-white hover:bg-gray-800 transition-all duration-200"
+                className="w-full flex items-center justify-center gap-3 py-3 px-4 border border-gray-600 rounded-2xl text-white hover:bg-secondary/20 hover:border-secondary transition-all duration-200"
               >
                 <svg className="w-5 h-5" viewBox="0 0 24 24">
                   <path
@@ -187,7 +187,7 @@ const LoginPage = () => {
 
               <button
                 type="button"
-                className="w-full flex items-center justify-center gap-3 py-3 px-4 border border-gray-600 rounded-2xl text-white hover:bg-gray-800 transition-all duration-200"
+                className="w-full flex items-center justify-center gap-3 py-3 px-4 border border-gray-600 rounded-2xl text-white hover:bg-secondary/20 hover:border-secondary transition-all duration-200"
               >
                 <svg
                   className="w-5 h-5"

@@ -111,12 +111,38 @@ export async function acceptFriendRequest(req, res) {
   }
 }
 
+export async function rejectFriendRequest(req, res) {
+  try {
+    const { id: requestId } = req.params;
+    const friendRequest = await FriendRequest.findById(requestId);
+
+    if (!friendRequest) {
+      return res.status(404).json({ message: "Friend request not found" });
+    }
+
+    // Only recipient can reject
+    if (friendRequest.recipient.toString() !== req.user.id) {
+      return res
+        .status(403)
+        .json({ message: "You are not authorized to reject this request" });
+    }
+
+    friendRequest.status = "rejected";
+    await friendRequest.save();
+
+    return res.status(200).json({ message: "Friend request rejected" });
+  } catch (error) {
+    console.error("Error rejecting friend request:", error);
+    res.status(500).json({ message: error.message });
+  }
+}
+
 export async function getPendingFriendRequests(req, res) {
   try {
     const pendingRequests = await FriendRequest.find({
       recipient: req.user.id,
       status: "pending",
-    }).populate("sender", "fullName profilePic");
+    }).populate("sender", "fullName profilePic bio");
 
     const acceptedRequest = await FriendRequest.find({
       recipient: req.user.id,
@@ -130,7 +156,7 @@ export async function getPendingFriendRequests(req, res) {
   }
 }
 
-export async function getOutgoingFriendRequests(req,res){
+export async function getOutgoingFriendRequests(req, res) {
   try {
     const outgoingRequests = await FriendRequest.find({
       sender: req.user.id,
@@ -144,7 +170,7 @@ export async function getOutgoingFriendRequests(req,res){
   }
 }
 
-export async function getAcceptedFriendRequests(req,res) {
+export async function getAcceptedFriendRequests(req, res) {
   try {
     const acceptedRequests = await FriendRequest.find({
       recipient: req.user.id,
