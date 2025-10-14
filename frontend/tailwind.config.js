@@ -5,7 +5,8 @@ export default {
     extend: {
       colors: {
         primary: "#212121",
-        secondary: "#7950be",
+        secondary: "#eff3f4",
+        "secondary-foreground": "#212121",
         "dark-card": "#2a2a2a",
       },
       borderWidth: {

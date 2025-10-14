@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { axiosInstance } from "../lib/axios";
 import toast from "react-hot-toast";
 import { LoadingSpinner } from "../components/ui/LoadingSpinner";
+import { FaCheck, FaTimes } from "react-icons/fa";
 
 const NotificationPage = () => {
   const queryClient = useQueryClient();
@@ -95,7 +96,7 @@ const NotificationPage = () => {
                   key={req._id}
                   className="bg-dark-card border border-gray-800 rounded-xl p-4 shadow-lg"
                 >
-                  <div className="flex items-start gap-4">
+                  <div className="flex items-center gap-4">
                     <img
                       src={
                         req.sender?.profilePic ||
@@ -106,51 +107,49 @@ const NotificationPage = () => {
                     />
                     <div className="min-w-0 flex-1">
                       <p className="font-medium">
-                        {req.sender?.fullName || "Unknown"}
+                        {req.sender?.fullName || "Unknown"} wants to connect.
                       </p>
-                      <p className="text-sm text-gray-400 line-clamp-3">
+                      <p className="text-sm text-gray-400 line-clamp-2">
                         {req.sender?.bio || "No bio provided."}
                       </p>
-
-                      <div className="mt-3 flex items-center gap-3">
-                        <button
-                          disabled={isAccepting}
-                          onClick={() => acceptReq(req._id)}
-                          className={`px-3 py-1.5 rounded-lg text-sm text-white ${
-                            isAccepting
-                              ? "bg-gray-600 cursor-not-allowed"
-                              : "bg-secondary hover:bg-[#6a40b4]"
-                          }`}
-                        >
-                          {isAccepting ? (
-                            <span className="flex items-center gap-2">
-                              <LoadingSpinner size="sm" showText={false} />{" "}
-                              Accepting
-                            </span>
-                          ) : (
-                            "Accept"
-                          )}
-                        </button>
-                        <button
-                          disabled={isRejecting}
-                          onClick={() => rejectReq(req._id)}
-                          className={`px-3 py-1.5 rounded-lg text-sm text-white ${
-                            isRejecting
-                              ? "bg-gray-600 cursor-not-allowed"
-                              : "bg-red-600 hover:bg-red-700"
-                          }`}
-                        >
-                          {isRejecting ? (
-                            <span className="flex items-center gap-2">
-                              <LoadingSpinner size="sm" showText={false} />{" "}
-                              Rejecting
-                            </span>
-                          ) : (
-                            "Reject"
-                          )}
-                        </button>
-                      </div>
                     </div>
+                  </div>
+
+                  <div className="mt-4 flex items-center gap-3">
+                    <button
+                      disabled={isAccepting || isRejecting}
+                      onClick={() => acceptReq(req._id)}
+                      className={`w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-full text-sm font-bold transition-all
+                            ${
+                              isAccepting
+                                ? "bg-gray-600 text-white/70 cursor-not-allowed"
+                                : "bg-secondary hover:bg-white text-secondary-foreground"
+                            }`}
+                    >
+                      {isAccepting ? (
+                        <LoadingSpinner size="sm" showText={false} />
+                      ) : (
+                        <FaCheck />
+                      )}
+                      Accept
+                    </button>
+                    <button
+                      disabled={isRejecting || isAccepting}
+                      onClick={() => rejectReq(req._id)}
+                      className={`w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-full text-sm font-bold transition-all
+                            ${
+                              isRejecting
+                                ? "bg-gray-600 text-white/70 cursor-not-allowed"
+                                : "bg-gray-700 hover:bg-gray-600 text-white"
+                            }`}
+                    >
+                      {isRejecting ? (
+                        <LoadingSpinner size="sm" showText={false} />
+                      ) : (
+                        <FaTimes />
+                      )}
+                      Reject
+                    </button>
                   </div>
                 </div>
               );

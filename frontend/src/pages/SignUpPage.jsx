@@ -239,11 +239,11 @@ const SignUpPage = () => {
               <button
                 type="submit"
                 disabled={isLoading}
-                className={`w-full py-3 px-6 rounded-full font-semibold text-white transition-all duration-300 relative
+                className={`w-full py-3.5 px-8 rounded-full font-semibold text-white transition-all duration-300
                   ${
                     isLoading
-                      ? "bg-gray-500 cursor-not-allowed"
-                      : "bg-secondary hover:bg-[#6a40b4] active:scale-95"
+                      ? "bg-gray-600 cursor-not-allowed"
+                      : "bg-secondary hover:bg-[#6d44b5] active:scale-[0.97]"
                   }
                   shadow-lg hover:shadow-secondary/40 focus:outline-none focus:ring-4 focus:ring-secondary/40`}
               >

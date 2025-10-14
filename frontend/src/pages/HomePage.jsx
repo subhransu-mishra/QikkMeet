@@ -3,6 +3,13 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { axiosInstance } from "../lib/axios";
 import { LoadingSpinner } from "../components/ui/LoadingSpinner";
 import toast from "react-hot-toast";
+import {
+  FaUserPlus,
+  FaClock,
+  FaCheck,
+  FaComments,
+  FaMapMarkerAlt,
+} from "react-icons/fa";
 
 const HomePage = () => {
   const queryClient = useQueryClient();
@@ -107,11 +114,11 @@ const HomePage = () => {
             You don’t have any friends yet. Discover people below and connect.
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {friends.map((f) => (
               <div
                 key={f._id}
-                className="bg-dark-card border border-gray-800 rounded-xl p-4 shadow-lg hover:shadow-secondary/20 transition-all duration-300"
+                className="bg-dark-card rounded-2xl p-5 shadow-lg flex flex-col gap-4"
               >
                 <div className="flex items-center gap-4">
                   <img
@@ -123,19 +130,21 @@ const HomePage = () => {
                     className="w-12 h-12 rounded-full object-cover"
                   />
                   <div className="min-w-0">
-                    <p className="font-medium truncate">{f.fullName}</p>
-                    <p className="text-xs text-gray-400">Friend</p>
+                    <p className="font-bold text-lg truncate">{f.fullName}</p>
+                    {/* Friend location can be added here if available */}
                   </div>
-                  <button
-                    type="button"
-                    className="ml-auto bg-secondary hover:bg-[#6a40b4] text-white px-3 py-1.5 rounded-lg text-sm"
-                    onClick={() =>
-                      toast("Open chat coming soon", { icon: "💬" })
-                    }
-                  >
-                    Chat
-                  </button>
                 </div>
+                <p className="text-sm text-gray-400">
+                  You and {f.fullName} are friends.
+                </p>
+                <button
+                  type="button"
+                  onClick={() => toast("Open chat coming soon", { icon: "💬" })}
+                  className="mt-auto w-full inline-flex items-center justify-center gap-2 bg-secondary hover:text-black hover:bg-white transition-colors text-secondary-foreground text-sm font-bold px-4 py-3 rounded-full shadow"
+                >
+                  <FaComments />
+                  Chat
+                </button>
               </div>
             ))}
           </div>
@@ -156,7 +165,7 @@ const HomePage = () => {
             No recommendations right now. Check back later.
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {recommended.map((u) => {
               const alreadyFriend = friendIds.has(u._id);
               const alreadyRequested = outgoingRecipientIds.has(u._id);
@@ -164,10 +173,41 @@ const HomePage = () => {
               const disabled =
                 alreadyFriend || alreadyRequested || isPendingThis;
 
+              let buttonContent;
+              if (alreadyFriend) {
+                buttonContent = (
+                  <span className="flex items-center gap-2">
+                    <FaCheck />
+                    Friends
+                  </span>
+                );
+              } else if (alreadyRequested) {
+                buttonContent = (
+                  <span className="flex items-center gap-2">
+                    <FaClock />
+                    Requested
+                  </span>
+                );
+              } else if (isPendingThis) {
+                buttonContent = (
+                  <span className="flex items-center gap-2">
+                    <LoadingSpinner size="sm" showText={false} />
+                    Sending
+                  </span>
+                );
+              } else {
+                buttonContent = (
+                  <span className="flex items-center gap-2">
+                    <FaUserPlus />
+                    Send Friend Request
+                  </span>
+                );
+              }
+
               return (
                 <div
                   key={u._id}
-                  className="bg-dark-card border border-gray-800 rounded-xl p-4 shadow-lg hover:shadow-secondary/20 transition-all duration-300"
+                  className="bg-dark-card rounded-2xl p-5 shadow-lg flex flex-col gap-4"
                 >
                   <div className="flex items-center gap-4">
                     <img
@@ -179,28 +219,31 @@ const HomePage = () => {
                       className="w-12 h-12 rounded-full object-cover"
                     />
                     <div className="min-w-0">
-                      <p className="font-medium truncate">{u.fullName}</p>
-                      <p className="text-xs text-gray-400">Suggested</p>
+                      <p className="font-bold text-lg truncate">{u.fullName}</p>
+                      {u.location && (
+                        <span className="inline-flex items-center gap-1.5 text-sm text-gray-400">
+                          <FaMapMarkerAlt />
+                          {u.location}
+                        </span>
+                      )}
                     </div>
-                    <button
-                      type="button"
-                      disabled={disabled}
-                      className={`ml-auto px-3 py-1.5 rounded-lg text-sm text-white transition-colors ${
-                        disabled
-                          ? "bg-gray-600 cursor-not-allowed"
-                          : "bg-secondary hover:bg-[#6a40b4]"
-                      }`}
-                      onClick={() => sendRequest(u._id)}
-                    >
-                      {alreadyFriend
-                        ? "Friends"
-                        : alreadyRequested
-                        ? "Requested"
-                        : isPendingThis
-                        ? "Sending..."
-                        : "Connect"}
-                    </button>
                   </div>
+                  <p className="text-sm text-gray-400 flex-grow min-h-[40px]">
+                    {u.bio || "No bio provided."}
+                  </p>
+                  <button
+                    type="button"
+                    disabled={disabled}
+                    onClick={() => !disabled && sendRequest(u._id)}
+                    className={`mt-auto w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-full text-sm font-bold transition-all
+                            ${
+                              disabled
+                                ? "bg-gray-600 text-white/70 cursor-not-allowed"
+                                : "bg-secondary hover:bg-white text-secondary-foreground"
+                            }`}
+                  >
+                    {buttonContent}
+                  </button>
                 </div>
               );
             })}

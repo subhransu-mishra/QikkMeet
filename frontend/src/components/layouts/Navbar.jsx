@@ -34,7 +34,7 @@ const Navbar = () => {
 
       {/* Right side - User Profile */}
       <div className="flex items-center space-x-3">
-        <button className="w-9 h-9 rounded-full bg-primary flex items-center justify-center text-gray-400 hover:text-secondary transition-colors">
+        <button className="w-9 h-9 rounded-full bg-primary flex items-center justify-center text-gray-400 hover:text-white hover:bg-secondary/30 transition-colors">
           <FaCog className="text-lg" />
         </button>
 

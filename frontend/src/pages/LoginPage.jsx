@@ -135,11 +135,11 @@ const LoginPage = () => {
               <button
                 type="submit"
                 disabled={isLoading}
-                className={`w-full py-3 px-6 rounded-full font-semibold text-white transition-all duration-300 relative
+                className={`w-full py-3.5 px-8 rounded-full font-semibold text-white transition-all duration-300
                   ${
                     isLoading
-                      ? "bg-gray-500 cursor-not-allowed"
-                      : "bg-secondary hover:bg-[#6a40b4] active:scale-95"
+                      ? "bg-gray-600 cursor-not-allowed"
+                      : "bg-secondary hover:bg-[#6d44b5] active:scale-[0.97]"
                   }
                   shadow-lg hover:shadow-secondary/40 focus:outline-none focus:ring-4 focus:ring-secondary/40`}
               >
@@ -162,7 +162,8 @@ const LoginPage = () => {
             <div className="mt-6 space-y-3">
               <button
                 type="button"
-                className="w-full flex items-center justify-center gap-3 py-3 px-4 border border-gray-600 rounded-2xl text-white hover:bg-secondary/20 hover:border-secondary transition-all duration-200"
+                className="w-full flex items-center justify-center gap-3 py-3.5 px-6 rounded-full bg-secondary text-white font-medium
+                hover:bg-[#6d44b5] transition-all duration-200 shadow hover:shadow-secondary/40"
               >
                 <svg className="w-5 h-5" viewBox="0 0 24 24">
                   <path
@@ -187,7 +188,8 @@ const LoginPage = () => {
 
               <button
                 type="button"
-                className="w-full flex items-center justify-center gap-3 py-3 px-4 border border-gray-600 rounded-2xl text-white hover:bg-secondary/20 hover:border-secondary transition-all duration-200"
+                className="w-full flex items-center justify-center gap-3 py-3.5 px-6 rounded-full bg-secondary text-white font-medium
+                hover:bg-[#6d44b5] transition-all duration-200 shadow hover:shadow-secondary/40"
               >
                 <svg
                   className="w-5 h-5"

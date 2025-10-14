@@ -45,28 +45,35 @@ const Sidebar = () => {
 
       {/* Navigation Items */}
       <div className="flex-1 py-6">
-        <ul className="space-y-2 px-3">
-          {sidebarItems.map((item) => (
-            <li key={item.path}>
-              <Link
-                to={item.path}
-                className={`flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-200 hover:bg-secondary/20 group ${
-                  location.pathname === item.path
-                    ? "bg-secondary text-white"
-                    : "text-gray-400 hover:text-white"
-                }`}
-              >
-                <item.icon
-                  className={`text-xl ${
-                    location.pathname === item.path
-                      ? "text-white"
-                      : "group-hover:text-secondary"
-                  }`}
-                />
-                <span className="hidden lg:block">{item.label}</span>
-              </Link>
-            </li>
-          ))}
+        <ul className="space-y-3 px-3">
+          {sidebarItems.map((item) => {
+            const active = location.pathname === item.path;
+            return (
+              <li key={item.path}>
+                <Link
+                  to={item.path}
+                  className={`group flex items-center gap-4 w-full
+                   px-3 lg:px-5 py-3 rounded-full font-medium text-sm tracking-wide
+                   transition-all duration-200
+                   ${
+                     active
+                       ? "bg-secondary text-white shadow-lg shadow-secondary/40"
+                       : "text-gray-400 hover:text-white hover:bg-secondary/20"
+                   }`}
+                >
+                  <item.icon
+                    className={`text-xl transition-colors ${
+                      active ? "text-white" : "group-hover:text-secondary"
+                    }`}
+                  />
+                  <span className="hidden lg:block">{item.label}</span>
+                  {active && (
+                    <span className="ml-auto hidden lg:inline-flex h-2 w-2 rounded-full bg-white/90 shadow" />
+                  )}
+                </Link>
+              </li>
+            );
+          })}
         </ul>
       </div>
 
@@ -74,9 +81,10 @@ const Sidebar = () => {
       <div className="p-4 mt-auto border-t border-gray-800">
         <button
           onClick={handleLogout}
-          className="w-full flex items-center justify-center lg:justify-start space-x-3 px-4 py-3 rounded-xl text-gray-400 hover:text-white transition-all duration-200 hover:bg-red-500/20 group"
+          className="w-full flex items-center gap-4 justify-center lg:justify-start px-5 py-3 rounded-full text-gray-300 hover:text-white
+          transition-all duration-200 bg-secondary/10 hover:bg-secondary/20 font-medium text-sm"
         >
-          <FaSignOutAlt className="text-xl group-hover:text-red-500" />
+          <FaSignOutAlt className="text-lg group-hover:text-red-400" />
           <span className="hidden lg:block">Logout</span>
         </button>
       </div>

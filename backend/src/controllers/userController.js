@@ -4,18 +4,30 @@ export async function getRecommendedUsers(req, res) {
   try {
     const currentUserId = req.user.id;
     const currentUser = req.user;
+    const userLocation = (currentUser.location || "").trim().toLowerCase();
 
-    const recommendedUser = await User.find({
+    const candidates = await User.find({
       $and: [
         { _id: { $ne: currentUserId } }, // Exclude current user
         { _id: { $nin: currentUser.friends } }, // Exclude current user's friends
         { isOnboarded: true }, // Only include onboarded users
       ],
+    }).select("fullName profilePic location bio");
+
+    const sorted = candidates.sort((a, b) => {
+      const aLoc = (a.location || "").trim().toLowerCase();
+      const bLoc = (b.location || "").trim().toLowerCase();
+      const aMatch = aLoc && userLocation && aLoc === userLocation;
+      const bMatch = bLoc && userLocation && bLoc === userLocation;
+      if (aMatch && !bMatch) return -1;
+      if (!aMatch && bMatch) return 1;
+      return 0;
     });
 
-    res.status(200).json(recommendedUser);
+    res.status(200).json(sorted);
   } catch (error) {
     console.error("Error fetching recommended users:", error);
+    res.status(500).json({ message: "Failed to fetch recommended users" });
   }
 }
 export async function getMyFriends(req, res) {
@@ -142,7 +154,7 @@ export async function getPendingFriendRequests(req, res) {
     const pendingRequests = await FriendRequest.find({
       recipient: req.user.id,
       status: "pending",
-    }).populate("sender", "fullName profilePic bio");
+    }).populate("sender", "fullName profilePic bio location");
 
     const acceptedRequest = await FriendRequest.find({
       recipient: req.user.id,
