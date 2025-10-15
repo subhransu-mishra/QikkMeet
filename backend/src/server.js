@@ -5,6 +5,7 @@ import dotenv from "dotenv";
 import authRoutes from "./routes/authRoute.js";
 import { connectDB } from "./lib/db.js";
 import userRoutes from "./routes/userRoute.js";
+import streamRoute from "./routes/streamRoute.js"; // Import the new stream route
 import chatRoutes from "./routes/chatRoute.js";
 
 const PORT = process.env.PORT || 5001;
@@ -28,6 +29,7 @@ app.get("/", (req, res) => {
 //Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
+app.use("/api/stream", streamRoute); // Add the stream route
 app.use("/api/chats", chatRoutes);
 
 app.listen(PORT, () => {

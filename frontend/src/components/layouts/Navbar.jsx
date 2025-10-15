@@ -1,15 +1,12 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { FaVideo, FaSearch, FaCog } from "react-icons/fa";
-import { useQueryClient } from "@tanstack/react-query";
+import { useAuth } from "../../hooks/useAuth";
 
 const Navbar = () => {
   const [showUserMenu, setShowUserMenu] = useState(false);
-
-  // Get cached auth user from React Query (App.jsx populates it)
-  const queryClient = useQueryClient();
-  const authData = queryClient.getQueryData(["authUser"]);
-  const user = authData?.user;
+  const { authUser } = useAuth();
+  const user = authUser;
 
   return (
     <header className="h-16 border-b border-gray-800 bg-dark-card px-6 flex items-center justify-between">

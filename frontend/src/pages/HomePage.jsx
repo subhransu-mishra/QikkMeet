@@ -10,6 +10,7 @@ import {
   FaComments,
   FaMapMarkerAlt,
 } from "react-icons/fa";
+import { Link } from "react-router-dom";
 
 const HomePage = () => {
   const queryClient = useQueryClient();
@@ -134,17 +135,16 @@ const HomePage = () => {
                     {/* Friend location can be added here if available */}
                   </div>
                 </div>
-                <p className="text-sm text-gray-400">
-                  You and {f.fullName} are friends.
-                </p>
-                <button
-                  type="button"
-                  onClick={() => toast("Open chat coming soon", { icon: "💬" })}
-                  className="mt-auto w-full inline-flex items-center justify-center gap-2 bg-secondary hover:text-black hover:bg-white transition-colors text-secondary-foreground text-sm font-bold px-4 py-3 rounded-full shadow"
-                >
-                  <FaComments />
-                  Chat
-                </button>
+                <p className="text-sm text-gray-400 mt-1">You are connected.</p>
+                <div className="mt-3">
+                  <Link
+                    to={`/chat/${f._id}`}
+                    className="inline-flex items-center justify-center gap-2 bg-secondary hover:bg-white transition-colors text-secondary-foreground text-sm font-bold px-6 py-2.5 rounded-full shadow"
+                  >
+                    <FaComments />
+                    Chat
+                  </Link>
+                </div>
               </div>
             ))}
           </div>
@@ -197,7 +197,7 @@ const HomePage = () => {
                 );
               } else {
                 buttonContent = (
-                  <span className="flex items-center gap-2">
+                  <span className="flex items-center gap-2 ">
                     <FaUserPlus />
                     Send Friend Request
                   </span>

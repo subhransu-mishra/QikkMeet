@@ -1,6 +1,5 @@
 @import "tailwindcss";
 
-
 @layer base {
   * {
     color: white;
@@ -13,5 +12,60 @@
 
   input::placeholder {
     color: #9ca3af;
+  }
+}
+
+/* Stream Chat overrides */
+@layer components {
+  /* Set dark background to match bg-primary across chat surfaces */
+  .str-chat,
+  .str-chat__theme-dark,
+  .str-chat__channel,
+  .str-chat__main-panel,
+  .str-chat__message-list,
+  .str-chat__window,
+  .str-chat__list,
+  .str-chat__date-separator,
+  .str-chat__thread,
+  .str-chat__virtual-message-list {
+    background-color: #212121 !important; /* bg-primary */
+  }
+
+  /* Message input area background + subtle top border */
+  .str-chat__message-input,
+  .str-chat__message-input-flat,
+  .str-chat__message-input--emojis {
+    background-color: #212121 !important; /* bg-primary */
+    border-top: 1px solid #3f3f3f;
+  }
+
+  /* Send button styles (rounded, #eff3f4 background, dark text) */
+  .str-chat__message-input__send-button button,
+  .str-chat__send-button,
+  .str-chat__message-input__button--send,
+  button[data-testid="send-button"],
+  button[data-testid="message-input-send-button"] {
+    background-color: #eff3f4 !important;
+    color: #212121 !important; /* secondary-foreground */
+    border-radius: 9999px !important; /* rounded-full */
+    transition: filter 150ms ease;
+  }
+
+  .str-chat__message-input__send-button button:hover,
+  .str-chat__send-button:hover,
+  .str-chat__message-input__button--send:hover,
+  button[data-testid="send-button"]:hover,
+  button[data-testid="message-input-send-button"]:hover {
+    filter: brightness(0.95);
+  }
+
+  /* Ensure send icon is dark on light button */
+  .str-chat__message-input__send-button button svg,
+  .str-chat__send-button svg,
+  .str-chat__message-input__button--send svg,
+  button[data-testid="send-button"] svg,
+  button[data-testid="message-input-send-button"] svg {
+    color: #212121 !important;
+    fill: currentColor !important;
   }
 }

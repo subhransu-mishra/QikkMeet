@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import HomePage from "./pages/HomePage";
 import LoginPage from "./pages/LoginPage";
@@ -8,33 +8,12 @@ import NotificationPage from "./pages/NotificationPage";
 import CallPage from "./pages/CallPage";
 import ChatPage from "./pages/ChatPage";
 import { Toaster } from "react-hot-toast";
-import { useQuery } from "@tanstack/react-query";
-import { axiosInstance } from "./lib/axios";
+import { useAuth } from "./hooks/useAuth";
 import { LoadingSpinner } from "./components/ui/LoadingSpinner";
 import MainLayout from "./components/layouts/MainLayout";
 
 const App = () => {
-  const {
-    data: authData,
-    isLoading,
-    isError,
-  } = useQuery({
-    queryKey: ["authUser"],
-    queryFn: async () => {
-      try {
-        const res = await axiosInstance.get("/auth/me");
-        return res.data;
-      } catch (error) {
-        if (error.response?.status === 401) {
-          localStorage.removeItem("token");
-          return { user: null };
-        }
-        throw error;
-      }
-    },
-    retry: false,
-    refetchOnWindowFocus: false,
-  });
+  const { authUser, isLoading } = useAuth();
 
   if (isLoading)
     return (
@@ -45,7 +24,6 @@ const App = () => {
       </div>
     );
 
-  const authUser = authData?.user;
   const isOnboarded = Boolean(authUser?.isOnboarded);
 
   // Protected route wrapper: require auth, and force onboarding if not completed
@@ -121,6 +99,14 @@ const App = () => {
         />
         <Route
           path="/chat"
+          element={
+            <ProtectedRoute>
+              <ChatPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/chat/:id"
           element={
             <ProtectedRoute>
               <ChatPage />

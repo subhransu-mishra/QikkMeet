@@ -38,7 +38,7 @@ const Sidebar = () => {
             <FaVideo className="text-white text-xl" />
           </div>
           <span className="text-xl font-bold text-white hidden lg:block">
-            VidChat
+            QikMeet
           </span>
         </Link>
       </div>
