@@ -17,7 +17,7 @@ const Sidebar = () => {
 
   const sidebarItems = [
     { icon: FaCompass, label: "Explore", path: "/" },
-    { icon: FaEnvelope, label: "Messages", path: "/chat" },
+    { icon: FaEnvelope, label: "Chats", path: "/chat" },
     { icon: FaBell, label: "Notifications", path: "/notifications" },
     { icon: FaVideo, label: "Video Call", path: "/call" },
   ];

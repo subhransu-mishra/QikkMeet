@@ -7,6 +7,7 @@ import OnBoardingPage from "./pages/OnBoardingPage";
 import NotificationPage from "./pages/NotificationPage";
 import CallPage from "./pages/CallPage";
 import ChatPage from "./pages/ChatPage";
+import Chats from "./pages/Chats";
 import { Toaster } from "react-hot-toast";
 import { useAuth } from "./hooks/useAuth";
 import { LoadingSpinner } from "./components/ui/LoadingSpinner";
@@ -101,7 +102,7 @@ const App = () => {
           path="/chat"
           element={
             <ProtectedRoute>
-              <ChatPage />
+              <Chats />
             </ProtectedRoute>
           }
         />
