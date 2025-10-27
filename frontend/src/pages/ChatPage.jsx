@@ -143,9 +143,10 @@ const ChatPage = () => {
       .find((u) => u?.id !== authUser?.id);
 
   const handleStartCall = () => {
-    // Generate unique call link
     const callId = `call-${[authUser.id, chatWithUserId].sort().join("-")}`;
-    const link = `${window.location.origin}/call?with=${chatWithUserId}&callId=${callId}`;
+    // In production we use HashRouter => include '#'
+    const hashPrefix = import.meta.env.PROD ? "/#" : "";
+    const link = `${window.location.origin}${hashPrefix}/call?with=${chatWithUserId}&callId=${callId}`;
     setCallLink(link);
     setShowCallModal(true);
   };
@@ -156,9 +157,12 @@ const ChatPage = () => {
   };
 
   const handleJoinCall = () => {
-    navigate(
-      `/call?with=${chatWithUserId}&callId=${callLink.split("callId=")[1]}`
-    );
+    // Prefer building navigation via object to avoid any relative path issues
+    const callIdParam = callLink.split("callId=")[1];
+    navigate({
+      pathname: "/call",
+      search: `?with=${chatWithUserId}&callId=${callIdParam}`,
+    });
     setShowCallModal(false);
   };
 
