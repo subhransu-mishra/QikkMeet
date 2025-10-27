@@ -2,7 +2,6 @@ import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
-import helmet from "helmet";
 import compression from "compression";
 import rateLimit from "express-rate-limit";
 import authRoutes from "./routes/authRoute.js";
@@ -15,12 +14,17 @@ dotenv.config();
 
 const app = express();
 
-// Security headers
-app.use(
-  helmet({
-    crossOriginResourcePolicy: { policy: "cross-origin" },
-  })
-);
+// Lightweight security headers (replacement for helmet)
+app.use((req, res, next) => {
+  // Similar to helmet defaults
+  res.setHeader("X-Content-Type-Options", "nosniff");
+  res.setHeader("X-Frame-Options", "SAMEORIGIN");
+  res.setHeader("Referrer-Policy", "no-referrer");
+  res.setHeader("X-DNS-Prefetch-Control", "off");
+  // Match your previous helmet config
+  res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
+  next();
+});
 
 // Trust proxy (needed if behind reverse proxy)
 app.set("trust proxy", 1);
