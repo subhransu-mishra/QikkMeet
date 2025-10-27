@@ -1,14 +1,16 @@
 @import "tailwindcss";
 
 @layer base {
-  * {
-    color: white;
+  /* Set app-wide theme without forcing color on every element */
+  html,
+  body,
+  #root {
+    background-color: #000000;
+    color: #ffffff;
   }
 
-  body {
-    background-color: #212121;
-    color: white;
-  }
+  /* remove the global wildcard color rule to avoid overriding button text */
+  /* previously: * { color: white; } */
 
   input::placeholder {
     color: #9ca3af;
@@ -67,5 +69,111 @@
   button[data-testid="message-input-send-button"] svg {
     color: #212121 !important;
     fill: currentColor !important;
+  }
+}
+
+/* Stream Video SDK overrides - Fix button visibility */
+@layer components {
+  /* Call controls container */
+  .str-video__call-controls {
+    background: rgba(33, 33, 33, 0.95) !important;
+    backdrop-filter: blur(10px);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 1.5rem !important;
+  }
+
+  /* All call control buttons */
+  .str-video__call-controls__button,
+  .str-video__composite-button,
+  button[data-testid*="button"] {
+    background: #eff3f4 !important;
+    border: none !important;
+    color: #212121 !important;
+    width: 48px !important;
+    height: 48px !important;
+    border-radius: 50% !important;
+    transition: all 0.2s ease !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  .str-video__call-controls__button:hover,
+  .str-video__composite-button:hover {
+    background: #ffffff !important;
+    transform: scale(1.05);
+  }
+
+  /* End call button - red theme */
+  .str-video__call-controls__button[data-testid="hangup-button"],
+  button[title*="Leave"],
+  button[title*="leave"],
+  button[title*="End"],
+  .str-video__call-controls__button--leave {
+    background: rgba(239, 68, 68, 0.9) !important;
+    color: white !important;
+  }
+
+  .str-video__call-controls__button[data-testid="hangup-button"]:hover {
+    background: rgba(220, 38, 38, 1) !important;
+  }
+
+  /* Icons inside buttons */
+  .str-video__call-controls__button svg,
+  .str-video__composite-button svg {
+    color: #212121 !important;
+    fill: #212121 !important;
+  }
+
+  /* Leave button icon should be white */
+  .str-video__call-controls__button[data-testid="hangup-button"] svg,
+  .str-video__call-controls__button--leave svg {
+    color: white !important;
+    fill: white !important;
+  }
+
+  /* Speaker layout background */
+  .str-video__speaker-layout {
+    background: #1a1a1a !important;
+  }
+
+  /* Participant video tiles */
+  .str-video__participant-view {
+    border-radius: 12px !important;
+    overflow: hidden !important;
+    border: 2px solid #eff3f4 !important;
+  }
+
+  /* Participant name label */
+  .str-video__participant-details {
+    background: rgba(33, 33, 33, 0.8) !important;
+    backdrop-filter: blur(10px);
+    border-radius: 8px !important;
+    padding: 6px 12px !important;
+  }
+
+  /* Video placeholder when camera is off */
+  .str-video__video-placeholder {
+    background: #2a2a2a !important;
+  }
+
+  /* Active speaker indicator */
+  .str-video__participant-view--active-speaker {
+    border-color: #eff3f4 !important;
+    box-shadow: 0 0 0 3px rgba(239, 243, 244, 0.3) !important;
+  }
+
+  /* Modal backdrop animation */
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  .fixed.inset-0 {
+    animation: fadeIn 0.2s ease-in-out;
   }
 }

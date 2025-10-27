@@ -4,6 +4,7 @@ import { axiosInstance } from "../lib/axios";
 import toast from "react-hot-toast";
 import { LoadingSpinner } from "../components/ui/LoadingSpinner";
 import { FaCheck, FaTimes } from "react-icons/fa";
+import { motion } from "framer-motion";
 
 const NotificationPage = () => {
   const queryClient = useQueryClient();
@@ -75,26 +76,29 @@ const NotificationPage = () => {
   }
 
   return (
-    <div className="max-w-2xl mx-auto space-y-6">
+    <div className="max-w-2xl mx-auto space-y-6 text-white">
       <h1 className="text-2xl font-bold text-center">Notifications</h1>
 
       <section className="space-y-4">
         <h2 className="text-lg font-semibold text-center">Friend Requests</h2>
 
         {pending.length === 0 ? (
-          <div className="bg-dark-card border border-gray-800 rounded-xl p-6 text-gray-400 text-center">
+          <div className="bg-black border border-white/10 rounded-xl p-6 text-white/60 text-center">
             No new friend requests.
           </div>
         ) : (
           <div className="space-y-4">
-            {pending.map((req) => {
+            {pending.map((req, idx) => {
               const isAccepting = acceptingId === req._id;
               const isRejecting = rejectingId === req._id;
 
               return (
-                <div
+                <motion.div
                   key={req._id}
-                  className="bg-dark-card border border-gray-800 rounded-xl p-4 shadow-lg"
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.2, delay: idx * 0.04 }}
+                  className="bg-[#0a0a0a] border border-white/10 rounded-xl p-4 shadow-lg"
                 >
                   <div className="flex items-center gap-4">
                     <img
@@ -122,8 +126,8 @@ const NotificationPage = () => {
                       className={`w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-full text-sm font-bold transition-all
                             ${
                               isAccepting
-                                ? "bg-gray-600 text-white/70 cursor-not-allowed"
-                                : "bg-secondary hover:bg-white text-secondary-foreground"
+                                ? "bg-white/10 text-white/60 cursor-not-allowed"
+                                : "bg-white text-black hover:bg-white/90"
                             }`}
                     >
                       {isAccepting ? (
@@ -139,8 +143,8 @@ const NotificationPage = () => {
                       className={`w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-full text-sm font-bold transition-all
                             ${
                               isRejecting
-                                ? "bg-gray-600 text-white/70 cursor-not-allowed"
-                                : "bg-gray-700 hover:bg-gray-600 text-white"
+                                ? "bg-white/10 text-white/60 cursor-not-allowed"
+                                : "bg-white/10 hover:bg-white/20 text-white"
                             }`}
                     >
                       {isRejecting ? (
@@ -151,7 +155,7 @@ const NotificationPage = () => {
                       Reject
                     </button>
                   </div>
-                </div>
+                </motion.div>
               );
             })}
           </div>

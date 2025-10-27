@@ -12,6 +12,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { axiosInstance } from "../lib/axios";
 import toast from "react-hot-toast";
 import { LoadingSpinner } from "../components/ui/LoadingSpinner";
+import { motion } from "framer-motion";
 
 const SignUpPage = () => {
   const navigate = useNavigate();
@@ -82,10 +83,15 @@ const SignUpPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-primary flex items-center justify-center px-4 py-8 text-white">
+    <div className="min-h-screen bg-black flex items-center justify-center px-4 py-8 text-white">
       <div className="w-full max-w-6xl flex items-center justify-center">
-        <div className="w-full lg:w-1/2 xl:w-2/5">
-          <div className="bg-dark-card rounded-2xl shadow-2xl shadow-secondary/20 p-8 animate-slide-up">
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.25 }}
+          className="w-full lg:w-1/2 xl:w-2/5"
+        >
+          <div className="bg-[#0a0a0a] border border-white/10 rounded-2xl shadow-2xl p-8">
             {/* Header */}
             <div className="text-center mb-8">
               <h2 className="text-3xl font-bold text-white mb-2">
@@ -239,13 +245,13 @@ const SignUpPage = () => {
               <button
                 type="submit"
                 disabled={isLoading}
-                className={`w-full py-3.5 px-8 rounded-full font-semibold text-white transition-all duration-300
+                className={`w-full py-3.5 px-8 rounded-full font-semibold transition-all duration-300
                   ${
                     isLoading
-                      ? "bg-gray-600 cursor-not-allowed"
-                      : "bg-secondary hover:bg-[#6d44b5] active:scale-[0.97]"
+                      ? "bg-white/10 text-white/60 cursor-not-allowed"
+                      : "bg-white text-black hover:bg-white/90"
                   }
-                  shadow-lg hover:shadow-secondary/40 focus:outline-none focus:ring-4 focus:ring-secondary/40`}
+                  shadow-lg`}
               >
                 {isLoading ? (
                   <LoadingSpinner text="Creating Account..." size="md" />
@@ -268,7 +274,7 @@ const SignUpPage = () => {
               </p>
             </div>
           </div>
-        </div>
+        </motion.div>
 
         {/* Right Side Image - Hidden on mobile */}
         <div className="hidden lg:flex lg:w-1/2 xl:w-3/5 items-center justify-center pl-8">

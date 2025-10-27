@@ -4,7 +4,7 @@ import Navbar from "./Navbar";
 
 const MainLayout = ({ children }) => {
   return (
-    <div className="flex h-screen bg-primary text-white">
+    <div className="flex h-screen bg-black text-white">
       {/* Sidebar */}
       <Sidebar />
 
@@ -14,7 +14,9 @@ const MainLayout = ({ children }) => {
         <Navbar />
 
         {/* Page Content */}
-        <main className="flex-1 overflow-auto p-6">{children}</main>
+        <main className="flex-1 overflow-auto p-6 lg:p-8 bg-black">
+          {children}
+        </main>
       </div>
     </div>
   );

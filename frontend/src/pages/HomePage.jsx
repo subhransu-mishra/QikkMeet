@@ -11,10 +11,13 @@ import {
   FaMapMarkerAlt,
 } from "react-icons/fa";
 import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
+import { useAuth } from "../hooks/useAuth"; // [ADD] import
 
 const HomePage = () => {
   const queryClient = useQueryClient();
   const [pendingConnectId, setPendingConnectId] = useState(null);
+  const { authUser } = useAuth(); // [ADD] get current user
 
   // Fetch friends
   const {
@@ -102,24 +105,31 @@ const HomePage = () => {
   }
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-10 text-white">
       {/* Friends Section */}
-      <section>
+      <motion.section
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.25 }}
+      >
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-xl font-semibold">Your Friends</h2>
-          <span className="text-sm text-gray-400">{friends.length} total</span>
+          <span className="text-sm text-white/50">{friends.length} total</span>
         </div>
 
         {friends.length === 0 ? (
-          <div className="bg-dark-card border border-gray-800 rounded-xl p-6 text-gray-400">
+          <div className="bg-black border border-white/10 rounded-xl p-6 text-white/60">
             You don’t have any friends yet. Discover people below and connect.
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {friends.map((f) => (
-              <div
+            {friends.map((f, idx) => (
+              <motion.div
                 key={f._id}
-                className="bg-dark-card rounded-2xl p-5 shadow-lg flex flex-col gap-4"
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.2, delay: idx * 0.04 }}
+                className="bg-[#0a0a0a] border border-white/10 rounded-2xl p-5 shadow-lg hover:shadow-white/5 transition-shadow"
               >
                 <div className="flex items-center gap-4">
                   <img
@@ -128,45 +138,59 @@ const HomePage = () => {
                       "https://avatar.iran.liara.run/public/avatars/1.svg"
                     }
                     alt={f.fullName}
-                    className="w-12 h-12 rounded-full object-cover"
+                    className="w-12 h-12 rounded-full object-cover ring-2 ring-white/10"
                   />
                   <div className="min-w-0">
                     <p className="font-bold text-lg truncate">{f.fullName}</p>
-                    {/* Friend location can be added here if available */}
+                    {/* optional meta */}
                   </div>
                 </div>
-                <p className="text-sm text-gray-400 mt-1">You are connected.</p>
-                <div className="mt-3">
-                  <Link
-                    to={`/chat/${f._id}`}
-                    className="inline-flex items-center justify-center gap-2 bg-secondary hover:bg-white transition-colors text-secondary-foreground text-sm font-bold px-6 py-2.5 rounded-full shadow"
-                  >
-                    <FaComments />
-                    Chat
-                  </Link>
+                <p className="text-sm text-white/60 mt-2">You are connected.</p>
+                <div className="mt-4">
+                  {f._id !== authUser?.id ? ( // [FIX] authUser is now defined
+                    <Link
+                      to={`/chat/${f._id}`}
+                      className="inline-flex items-center justify-center gap-2 bg-white text-black text-sm font-bold px-6 py-2.5 rounded-full hover:bg-white/90 transition-colors"
+                    >
+                      <FaComments />
+                      Chat
+                    </Link>
+                  ) : (
+                    <button
+                      disabled
+                      className="inline-flex items-center justify-center gap-2 bg-white/10 text-white/60 text-sm font-bold px-6 py-2.5 rounded-full cursor-not-allowed"
+                    >
+                      <FaComments />
+                      That's You
+                    </button>
+                  )}
                 </div>
-              </div>
+              </motion.div>
             ))}
           </div>
         )}
-      </section>
+      </motion.section>
 
       {/* Recommended Users Section */}
-      <section>
+      <motion.section
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.25, delay: 0.05 }}
+      >
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-xl font-semibold">Recommended Users</h2>
-          <span className="text-sm text-gray-400">
+          <span className="text-sm text-white/50">
             {recommended.length} found
           </span>
         </div>
 
         {recommended.length === 0 ? (
-          <div className="bg-dark-card border border-gray-800 rounded-xl p-6 text-gray-400">
+          <div className="bg-black border border-white/10 rounded-xl p-6 text-white/60">
             No recommendations right now. Check back later.
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {recommended.map((u) => {
+            {recommended.map((u, idx) => {
               const alreadyFriend = friendIds.has(u._id);
               const alreadyRequested = outgoingRecipientIds.has(u._id);
               const isPendingThis = pendingConnectId === u._id && sending;
@@ -197,7 +221,7 @@ const HomePage = () => {
                 );
               } else {
                 buttonContent = (
-                  <span className="flex items-center gap-2 ">
+                  <span className="flex items-center gap-2 cursor-pointer">
                     <FaUserPlus />
                     Send Friend Request
                   </span>
@@ -205,9 +229,12 @@ const HomePage = () => {
               }
 
               return (
-                <div
+                <motion.div
                   key={u._id}
-                  className="bg-dark-card rounded-2xl p-5 shadow-lg flex flex-col gap-4"
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.2, delay: idx * 0.04 }}
+                  className="bg-[#0a0a0a] border border-white/10 rounded-2xl p-5 shadow-lg hover:shadow-white/5 transition-shadow"
                 >
                   <div className="flex items-center gap-4">
                     <img
@@ -216,40 +243,40 @@ const HomePage = () => {
                         "https://avatar.iran.liara.run/public/avatars/2.svg"
                       }
                       alt={u.fullName}
-                      className="w-12 h-12 rounded-full object-cover"
+                      className="w-12 h-12 rounded-full object-cover ring-2 ring-white/10"
                     />
                     <div className="min-w-0">
                       <p className="font-bold text-lg truncate">{u.fullName}</p>
                       {u.location && (
-                        <span className="inline-flex items-center gap-1.5 text-sm text-gray-400">
+                        <span className="inline-flex items-center gap-1.5 text-sm text-white/60">
                           <FaMapMarkerAlt />
                           {u.location}
                         </span>
                       )}
                     </div>
                   </div>
-                  <p className="text-sm text-gray-400 flex-grow min-h-[40px]">
+                  <p className="text-sm text-white/60 flex-grow min-h-[40px] mt-2">
                     {u.bio || "No bio provided."}
                   </p>
                   <button
                     type="button"
                     disabled={disabled}
                     onClick={() => !disabled && sendRequest(u._id)}
-                    className={`mt-auto w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-full text-sm font-bold transition-all
+                    className={`mt-4 w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-full text-sm font-bold transition-colors
                             ${
                               disabled
-                                ? "bg-gray-600 text-white/70 cursor-not-allowed"
-                                : "bg-secondary hover:bg-white text-secondary-foreground"
+                                ? "bg-white/10 text-white/50 cursor-not-allowed"
+                                : "bg-white text-black hover:bg-white/90"
                             }`}
                   >
                     {buttonContent}
                   </button>
-                </div>
+                </motion.div>
               );
             })}
           </div>
         )}
-      </section>
+      </motion.section>
     </div>
   );
 };

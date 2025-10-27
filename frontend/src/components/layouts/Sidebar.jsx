@@ -30,12 +30,12 @@ const Sidebar = () => {
   };
 
   return (
-    <div className="w-20 lg:w-64 bg-dark-card h-full flex flex-col shadow-lg z-10 transition-all duration-300">
+    <div className="w-20 lg:w-64 bg-black h-full flex flex-col shadow-lg z-10 transition-all duration-300">
       {/* Logo */}
-      <div className="h-16 flex items-center justify-center lg:justify-start px-4 border-b border-gray-800">
+      <div className="h-16 flex items-center justify-center lg:justify-start px-4 border-b border-white/10">
         <Link to="/" className="flex items-center space-x-2">
-          <div className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center">
-            <FaVideo className="text-white text-xl" />
+          <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center">
+            <FaVideo className="text-black text-xl" />
           </div>
           <span className="text-xl font-bold text-white hidden lg:block">
             QikMeet
@@ -57,18 +57,18 @@ const Sidebar = () => {
                    transition-all duration-200
                    ${
                      active
-                       ? "bg-secondary text-white shadow-lg shadow-secondary/40"
-                       : "text-gray-400 hover:text-white hover:bg-secondary/20"
+                       ? "bg-white text-black shadow-lg"
+                       : "text-white/70 hover:text-white hover:bg-white/10"
                    }`}
                 >
                   <item.icon
                     className={`text-xl transition-colors ${
-                      active ? "text-white" : "group-hover:text-secondary"
+                      active ? "text-black" : "group-hover:text-white"
                     }`}
                   />
                   <span className="hidden lg:block">{item.label}</span>
                   {active && (
-                    <span className="ml-auto hidden lg:inline-flex h-2 w-2 rounded-full bg-white/90 shadow" />
+                    <span className="ml-auto hidden lg:inline-flex h-2 w-2 rounded-full bg-black/80" />
                   )}
                 </Link>
               </li>
@@ -78,13 +78,13 @@ const Sidebar = () => {
       </div>
 
       {/* Logout Button */}
-      <div className="p-4 mt-auto border-t border-gray-800">
+      <div className="p-4 mt-auto border-t border-white/10">
         <button
           onClick={handleLogout}
-          className="w-full flex items-center gap-4 justify-center lg:justify-start px-5 py-3 rounded-full text-gray-300 hover:text-white
-          transition-all duration-200 bg-secondary/10 hover:bg-secondary/20 font-medium text-sm"
+          className="w-full flex cursor-pointer items-center gap-4 justify-center lg:justify-start px-5 py-3 rounded-full text-black bg-white
+          hover:bg-white/90 transition-all duration-200 font-medium text-sm"
         >
-          <FaSignOutAlt className="text-lg group-hover:text-red-400" />
+          <FaSignOutAlt className="text-lg" />
           <span className="hidden lg:block">Logout</span>
         </button>
       </div>

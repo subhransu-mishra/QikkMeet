@@ -18,7 +18,7 @@ const App = () => {
 
   if (isLoading)
     return (
-      <div className="h-screen bg-primary flex items-center justify-center text-white">
+      <div className="h-screen bg-black flex items-center justify-center text-white">
         <div className="flex flex-col items-center gap-4">
           <LoadingSpinner text="Loading..." size="xl" showText={true} />
         </div>
@@ -35,7 +35,7 @@ const App = () => {
   };
 
   return (
-    <div className="h-screen bg-primary text-white">
+    <div className="h-screen bg-black text-white">
       <Routes>
         {/* Auth routes without layout - redirect onboard-not-done users to /onboarding */}
         <Route
@@ -114,13 +114,14 @@ const App = () => {
             </ProtectedRoute>
           }
         />
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
       <Toaster
         toastOptions={{
           style: {
-            background: "#2a2a2a",
-            color: "#fff",
-            border: "1px solid #7950be",
+            background: "#000000",
+            color: "#ffffff",
+            border: "1px solid rgba(255,255,255,0.08)",
           },
         }}
       />
