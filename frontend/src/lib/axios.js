@@ -1,11 +1,15 @@
 import axios from "axios";
 
+// Prefer explicit env override if provided
 const envBase = import.meta.env?.VITE_BACKEND_URL;
-const inferredBase =
-  typeof window !== "undefined" ? `${window.location.origin}/api` : "/api";
 
-// Prefer explicit env; fallback to local dev, then inferred
-const baseURL = envBase || "http://localhost:5001/api";
+// Fixed production API endpoint (Render)
+const PROD_BASE = "https://qikmeet.onrender.com/api";
+// Local dev API endpoint
+const DEV_BASE = "http://localhost:5001/api";
+
+// Resolve base URL: env override > PROD fixed > DEV
+const baseURL = envBase || (import.meta.env.PROD ? PROD_BASE : DEV_BASE);
 
 export const axiosInstance = axios.create({
   baseURL,

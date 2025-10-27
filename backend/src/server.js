@@ -32,11 +32,12 @@ app.set("trust proxy", 1);
 // Compression
 app.use(compression());
 
-// CORS with env-based origins
+// CORS with environment-aware origins
+const isProd = process.env.NODE_ENV === "production";
 const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:5173";
 app.use(
   cors({
-    origin: [FRONTEND_URL, "http://localhost:5173"],
+    origin: isProd ? true : [FRONTEND_URL, "http://localhost:5173"],
     credentials: true,
   })
 );
