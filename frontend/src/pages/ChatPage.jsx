@@ -144,9 +144,7 @@ const ChatPage = () => {
 
   const handleStartCall = () => {
     const callId = `call-${[authUser.id, chatWithUserId].sort().join("-")}`;
-    // In production we use HashRouter => include '#'
-    const hashPrefix = import.meta.env.PROD ? "/#" : "";
-    const link = `${window.location.origin}${hashPrefix}/call?with=${chatWithUserId}&callId=${callId}`;
+    const link = `${window.location.origin}/call?with=${chatWithUserId}&callId=${callId}`;
     setCallLink(link);
     setShowCallModal(true);
   };
@@ -157,12 +155,8 @@ const ChatPage = () => {
   };
 
   const handleJoinCall = () => {
-    // Prefer building navigation via object to avoid any relative path issues
     const callIdParam = callLink.split("callId=")[1];
-    navigate({
-      pathname: "/call",
-      search: `?with=${chatWithUserId}&callId=${callIdParam}`,
-    });
+    navigate(`/call?with=${chatWithUserId}&callId=${callIdParam}`);
     setShowCallModal(false);
   };
 

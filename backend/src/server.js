@@ -67,22 +67,22 @@ app.use("/api/chats", chatRoutes);
 // ----- Serve frontend build and SPA fallback -----
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-// From backend/src to frontend/dist
 const clientDist = path.resolve(__dirname, "../../frontend/dist");
 
-// Serve static assets if the build exists
+// Serve static assets
 app.use(express.static(clientDist));
 
-// SPA fallback for non-API routes
-app.get("*", (req, res, next) => {
-  if (req.path.startsWith("/api")) return next();
-  // Send index.html for any other route so the client router can handle it
-  res.sendFile(path.join(clientDist, "index.html"));
-});
-
-// 404 handler (kept last)
-app.use((req, res) => {
-  res.status(404).json({ message: "Not Found" });
+// SPA fallback: serve index.html for non-API routes
+app.get("*", (req, res) => {
+  // Only handle non-API routes
+  if (req.path.startsWith("/api")) {
+    return res.status(404).json({ message: "API endpoint not found" });
+  }
+  res.sendFile(path.join(clientDist, "index.html"), (err) => {
+    if (err) {
+      res.status(500).send("Error loading application");
+    }
+  });
 });
 
 // Centralized error handler
