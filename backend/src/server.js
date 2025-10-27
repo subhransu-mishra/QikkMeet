@@ -8,6 +8,8 @@ import authRoutes from "./routes/authRoute.js";
 import { connectDB } from "./lib/db.js";
 import userRoutes from "./routes/userRoute.js";
 import chatRoutes from "./routes/chatRoute.js";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 
 const PORT = process.env.PORT || 5001;
 dotenv.config();
@@ -16,12 +18,10 @@ const app = express();
 
 // Lightweight security headers (replacement for helmet)
 app.use((req, res, next) => {
-  // Similar to helmet defaults
   res.setHeader("X-Content-Type-Options", "nosniff");
   res.setHeader("X-Frame-Options", "SAMEORIGIN");
   res.setHeader("Referrer-Policy", "no-referrer");
   res.setHeader("X-DNS-Prefetch-Control", "off");
-  // Match your previous helmet config
   res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
   next();
 });
@@ -59,12 +59,28 @@ const authLimiter = rateLimit({
 });
 app.use("/api/auth", authLimiter);
 
-//Routes
+// API Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/chats", chatRoutes);
 
-// 404 handler
+// ----- Serve frontend build and SPA fallback -----
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+// From backend/src to frontend/dist
+const clientDist = path.resolve(__dirname, "../../frontend/dist");
+
+// Serve static assets if the build exists
+app.use(express.static(clientDist));
+
+// SPA fallback for non-API routes
+app.get("*", (req, res, next) => {
+  if (req.path.startsWith("/api")) return next();
+  // Send index.html for any other route so the client router can handle it
+  res.sendFile(path.join(clientDist, "index.html"));
+});
+
+// 404 handler (kept last)
 app.use((req, res) => {
   res.status(404).json({ message: "Not Found" });
 });
