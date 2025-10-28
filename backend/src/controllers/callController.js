@@ -1,6 +1,7 @@
-import { StreamVideoServer } from "@stream-io/video-node-sdk";
+import { StreamClient } from "@stream-io/node-sdk";
 
-const streamVideo = StreamVideoServer.getInstance(
+// Initialize Stream Client for generating tokens
+const streamClient = new StreamClient(
   process.env.STREAM_API_KEY,
   process.env.STREAM_API_SECRET
 );
@@ -10,8 +11,11 @@ export const getCallToken = async (req, res) => {
     const userId = req.user.id;
     const callId = req.params.callId;
 
-    // Generate a token valid for 24 hours
-    const token = streamVideo.createToken(userId);
+    // Generate a video call token
+    const token = streamClient.generateCallToken({
+      user_id: userId,
+      call_cids: [`default:${callId}`],
+    });
 
     res.status(200).json({
       token,
@@ -28,7 +32,9 @@ export const getCallToken = async (req, res) => {
 export const endCall = async (req, res) => {
   try {
     const { callId } = req.params;
-    await streamVideo.endCall(callId);
+    const streamVideo = streamClient.video();
+    const call = streamVideo.call("default", callId);
+    await call.end();
     res.status(200).json({ message: "Call ended successfully" });
   } catch (error) {
     console.error("Error ending call:", error);

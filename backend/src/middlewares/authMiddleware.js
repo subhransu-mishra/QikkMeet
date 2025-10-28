@@ -22,7 +22,32 @@ export const protectRoute = async (req, res, next) => {
     req.user = user;
     next();
   } catch (error) {
-    console.log(error);
+    console.log("Auth middleware error:", error);
+
+    // Check if error is JWT related
+    if (error.name === "TokenExpiredError") {
+      return res
+        .status(401)
+        .json({ message: "Token expired, please login again" });
+    }
+
+    if (error.name === "JsonWebTokenError") {
+      return res.status(401).json({ message: "Invalid token" });
+    }
+
+    // Check if it's a MongoDB connection error
+    if (
+      error.name === "MongoServerSelectionError" ||
+      error.name === "MongoNetworkError"
+    ) {
+      return res
+        .status(503)
+        .json({
+          message:
+            "Database connection failed. Please check your MongoDB connection.",
+        });
+    }
+
     res.status(401).json({ message: "Not authorized, token failed" });
   }
 };

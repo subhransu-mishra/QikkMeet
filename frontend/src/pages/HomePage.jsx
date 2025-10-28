@@ -147,10 +147,10 @@ const HomePage = () => {
                 </div>
                 <p className="text-sm text-white/60 mt-2">You are connected.</p>
                 <div className="mt-4">
-                  {f._id !== authUser?.id ? ( // [FIX] authUser is now defined
+                  {f._id !== authUser?.id ? (
                     <Link
                       to={`/chat/${f._id}`}
-                      className="inline-flex items-center justify-center gap-2 bg-white text-black text-sm font-bold px-6 py-2.5 rounded-full hover:bg-white/90 transition-colors"
+                      className="inline-flex items-center justify-center gap-2 bg-white text-black text-sm font-bold px-6 py-2.5 rounded-full hover:bg-white/90 transition-colors cursor-pointer"
                     >
                       <FaComments />
                       Chat
@@ -266,7 +266,7 @@ const HomePage = () => {
                             ${
                               disabled
                                 ? "bg-white/10 text-white/50 cursor-not-allowed"
-                                : "bg-white text-black hover:bg-white/90"
+                                : "bg-white text-black hover:bg-white/90 cursor-pointer"
                             }`}
                   >
                     {buttonContent}

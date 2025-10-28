@@ -28,16 +28,6 @@ const CallPage = () => {
   const [incomingCall, setIncomingCall] = useState(null);
   const [isCallActive, setIsCallActive] = useState(false);
 
-  // Get Stream token
-  const { data: streamTokenData, isLoading: tokenLoading } = useQuery({
-    queryKey: ["streamToken"],
-    queryFn: async () => {
-      const res = await axiosInstance.get("/chats/token");
-      return res.data;
-    },
-    enabled: !!authUser,
-  });
-
   // Use callId from URL or generate one
   const callId = useMemo(() => {
     if (urlCallId) return urlCallId;
@@ -45,6 +35,16 @@ const CallPage = () => {
     const participants = [authUser.id, callWithUserId].sort();
     return `call-${participants.join("-")}`;
   }, [authUser?.id, callWithUserId, urlCallId]);
+
+  // Get Stream video token
+  const { data: streamTokenData, isLoading: tokenLoading } = useQuery({
+    queryKey: ["streamVideoToken", callId],
+    queryFn: async () => {
+      const res = await axiosInstance.get(`/calls/${callId}/token`);
+      return res.data;
+    },
+    enabled: !!authUser && !!callId,
+  });
 
   useEffect(() => {
     let videoClient = null;
@@ -108,7 +108,7 @@ const CallPage = () => {
             clearInterval(participantCheckInterval);
             callInstance.leave().then(() => {
               if (mounted) {
-                navigate(`/chat/${callWithUserId}`);
+                handleCallEnd();
               }
             });
           }
@@ -118,16 +118,13 @@ const CallPage = () => {
         callInstance.on("call.session_ended", async () => {
           if (!mounted) return;
           clearInterval(participantCheckInterval);
-          toast.info("Call ended");
-          setIsCallActive(false);
-          navigate(`/chat/${callWithUserId}`);
+          handleCallEnd();
         });
 
         callInstance.on("call.ended", async () => {
           if (!mounted) return;
           clearInterval(participantCheckInterval);
-          toast.info("Call ended");
-          navigate(`/chat/${callWithUserId}`);
+          handleCallEnd();
         });
 
         callInstance.on("call.leave", async () => {
@@ -195,39 +192,19 @@ const CallPage = () => {
     );
   }
 
+  const handleCallEnd = () => {
+    toast.info("Call ended");
+    navigate(`/chat/${callWithUserId}`);
+  };
+
   return (
     <div className="h-screen bg-black">
-      {/* Local style overrides for Stream Video controls */}
-      <style>{`
-        .str-video__call-controls {
-          background: rgba(0,0,0,0.85) !important;
-          backdrop-filter: blur(10px);
-          border-top: 1px solid rgba(255,255,255,0.08);
-          padding: 18px !important;
-        }
-        .str-video__call-controls__button,
-        .str-video__composite-button,
-        button[data-testid*="button"] {
-          background: #ffffff !important;
-          color: #000000 !important;
-          width: 48px !important;
-          height: 48px !important;
-          border-radius: 9999px !important;
-          border: none !important;
-        }
-        .str-video__call-controls__button:hover,
-        .str-video__composite-button:hover { background: #ffffffcc !important; }
-        .str-video__call-controls__button[data-testid="hangup-button"] {
-          background: rgba(239, 68, 68, 0.95) !important;
-          color: #ffffff !important;
-        }
-        .str-video__speaker-layout { background: #000000 !important; }
-        .str-video__participant-view {
-          border-radius: 12px !important;
-          border: 2px solid rgba(255,255,255,0.08) !important;
-          overflow: hidden !important;
-        }
-      `}</style>
+      {/* Debug info */}
+      <div className="absolute top-4 left-4 z-50 text-white text-xs bg-black/50 p-2 rounded">
+        <div>Client: {client ? "Connected" : "Not connected"}</div>
+        <div>Call: {call ? "Active" : "Not active"}</div>
+        <div>Call ID: {callId}</div>
+      </div>
 
       <StreamVideo client={client}>
         <StreamCall call={call}>
@@ -236,12 +213,7 @@ const CallPage = () => {
               <SpeakerLayout />
             </div>
             <div className="px-6 py-4 bg-black/60">
-              <CallControls
-                onLeave={() => {
-                  toast.info("Leaving call...");
-                  navigate(`/chat/${callWithUserId}`);
-                }}
-              />
+              <CallControls onLeave={handleCallEnd} />
             </div>
           </div>
         </StreamCall>

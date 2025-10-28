@@ -127,7 +127,7 @@ const NotificationPage = () => {
                             ${
                               isAccepting
                                 ? "bg-white/10 text-white/60 cursor-not-allowed"
-                                : "bg-white text-black hover:bg-white/90"
+                                : "bg-white text-black hover:bg-white/90 cursor-pointer"
                             }`}
                     >
                       {isAccepting ? (
@@ -144,7 +144,7 @@ const NotificationPage = () => {
                             ${
                               isRejecting
                                 ? "bg-white/10 text-white/60 cursor-not-allowed"
-                                : "bg-white/10 hover:bg-white/20 text-white"
+                                : "bg-white/10 hover:bg-white/20 text-white cursor-pointer"
                             }`}
                     >
                       {isRejecting ? (

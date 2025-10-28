@@ -141,7 +141,7 @@ const LoginPage = () => {
               <button
                 type="submit"
                 disabled={isLoading}
-                className={`w-full py-3.5 px-8 rounded-full font-semibold transition-all duration-300
+                className={`w-full py-3.5 px-8  rounded-full font-semibold transition-all duration-300 cursor-pointer
                   ${
                     isLoading
                       ? "bg-white/10 text-white/60 cursor-not-allowed"
@@ -150,7 +150,10 @@ const LoginPage = () => {
                   shadow-lg`}
               >
                 {isLoading ? (
-                  <LoadingSpinner text="Signing In..." size="md" />
+                  <div className="flex items-center justify-center gap-2">
+                    <LoadingSpinner size="sm" showText={false} />
+                    <span>Signing In...</span>
+                  </div>
                 ) : (
                   "Sign In"
                 )}
@@ -169,7 +172,7 @@ const LoginPage = () => {
               <button
                 type="button"
                 className="w-full flex items-center justify-center gap-3 py-3.5 px-6 rounded-full bg-secondary text-white font-medium
-                hover:bg-[#6d44b5] transition-all duration-200 shadow hover:shadow-secondary/40"
+                hover:bg-[#6d44b5] transition-all duration-200 shadow hover:shadow-secondary/40 cursor-pointer"
               >
                 <svg className="w-5 h-5" viewBox="0 0 24 24">
                   <path
@@ -195,7 +198,7 @@ const LoginPage = () => {
               <button
                 type="button"
                 className="w-full flex items-center justify-center gap-3 py-3.5 px-6 rounded-full bg-secondary text-white font-medium
-                hover:bg-[#6d44b5] transition-all duration-200 shadow hover:shadow-secondary/40"
+                hover:bg-[#6d44b5] transition-all duration-200 shadow hover:shadow-secondary/40 cursor-pointer"
               >
                 <svg
                   className="w-5 h-5"

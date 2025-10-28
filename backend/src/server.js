@@ -8,6 +8,7 @@ import authRoutes from "./routes/authRoute.js";
 import { connectDB } from "./lib/db.js";
 import userRoutes from "./routes/userRoute.js";
 import chatRoutes from "./routes/chatRoute.js";
+import callRoutes from "./routes/callRoute.js";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -60,9 +61,10 @@ const authLimiter = rateLimit({
 app.use("/api/auth", authLimiter);
 
 // API Routes
-app.use("/api/auth", authRoutes);
+app.use("/api/auth", authRoutes); // ✅ This mounts auth routes at /api/auth
 app.use("/api/users", userRoutes);
 app.use("/api/chats", chatRoutes);
+app.use("/api/calls", callRoutes); // Mount call routes for video calls
 
 // ----- Serve frontend build and SPA fallback -----
 const __filename = fileURLToPath(import.meta.url);

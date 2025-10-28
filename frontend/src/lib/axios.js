@@ -5,11 +5,13 @@ const envBase = import.meta.env?.VITE_BACKEND_URL;
 
 // Fixed production API endpoint (Render)
 const PROD_BASE = "https://qikmeet.onrender.com/api";
-// Local dev API endpoint
+// Local dev API endpoint - ensure /api suffix
 const DEV_BASE = "http://localhost:5001/api";
 
-// Resolve base URL: env override > PROD fixed > DEV
+// Resolve base URL: env override > production > development
 const baseURL = envBase || (import.meta.env.PROD ? PROD_BASE : DEV_BASE);
+
+console.log("[Axios] Using baseURL:", baseURL); // Debug log
 
 export const axiosInstance = axios.create({
   baseURL,

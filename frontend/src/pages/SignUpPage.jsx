@@ -245,7 +245,7 @@ const SignUpPage = () => {
               <button
                 type="submit"
                 disabled={isLoading}
-                className={`w-full py-3.5 px-8 rounded-full font-semibold transition-all duration-300
+                className={`w-full py-3.5 px-8 rounded-full font-semibold transition-all duration-300 cursor-pointer
                   ${
                     isLoading
                       ? "bg-white/10 text-white/60 cursor-not-allowed"
@@ -254,7 +254,10 @@ const SignUpPage = () => {
                   shadow-lg`}
               >
                 {isLoading ? (
-                  <LoadingSpinner text="Creating Account..." size="md" />
+                  <div className="flex items-center justify-center gap-2">
+                    <LoadingSpinner size="sm" showText={false} />
+                    <span>Creating Account...</span>
+                  </div>
                 ) : (
                   "Sign Up"
                 )}

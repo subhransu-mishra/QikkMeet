@@ -168,7 +168,7 @@ const OnBoardingPage = () => {
             <button
               type="button"
               onClick={generateRandomAvatar}
-              className="flex items-center gap-2 px-6 py-2.5 bg-secondary hover:bg-[#6d44b5] rounded-full text-white font-medium transition-all duration-200 active:scale-[0.97] shadow hover:shadow-secondary/40"
+              className="flex items-center gap-2 px-6 py-2.5 bg-secondary hover:bg-[#6d44b5] rounded-full text-white font-medium transition-all duration-200 active:scale-[0.97] shadow hover:shadow-secondary/40 cursor-pointer"
             >
               <FaRandom />
               Generate Random Avatar
@@ -270,7 +270,7 @@ const OnBoardingPage = () => {
             <button
               type="submit"
               disabled={isLoading || loadingCities}
-              className={`w-full py-3.5 px-8 rounded-full font-semibold transition-all duration-300
+              className={`w-full py-3.5 px-8 rounded-full font-semibold transition-all duration-300 cursor-pointer
                 ${
                   isLoading || loadingCities
                     ? "bg-white/10 text-white/60 cursor-not-allowed"
@@ -278,7 +278,10 @@ const OnBoardingPage = () => {
                 } shadow-lg`}
             >
               {isLoading ? (
-                <LoadingSpinner text="Completing Onboarding..." size="md" />
+                <div className="flex items-center justify-center gap-2">
+                  <LoadingSpinner size="sm" showText={false} />
+                  <span>Completing Onboarding...</span>
+                </div>
               ) : (
                 "Complete Onboarding"
               )}
