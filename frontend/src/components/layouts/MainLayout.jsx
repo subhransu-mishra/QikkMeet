@@ -13,8 +13,8 @@ const MainLayout = ({ children }) => {
         {/* Navbar */}
         <Navbar />
 
-        {/* Page Content */}
-        <main className="flex-1 overflow-auto p-6 lg:p-8 bg-black">
+        {/* Page Content - Add padding bottom for mobile navigation */}
+        <main className="flex-1 overflow-auto p-6 lg:p-8 bg-black pb-20 lg:pb-8">
           {children}
         </main>
       </div>

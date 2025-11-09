@@ -66,6 +66,9 @@ app.use("/api/users", userRoutes);
 app.use("/api/chats", chatRoutes);
 app.use("/api/calls", callRoutes); // Mount call routes for video calls
 
+// Favicon (avoid 404 noise)
+app.get("/favicon.ico", (_req, res) => res.status(204).end());
+
 // ----- Serve frontend build and SPA fallback -----
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

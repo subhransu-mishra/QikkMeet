@@ -28,8 +28,10 @@ const OnBoardingPage = () => {
   }, []);
 
   const generateRandomAvatar = () => {
-    const idx = Math.floor(Math.random() * 100) + 1;
-    const randomAvatar = `https://avatar.iran.liara.run/public/avatars/${idx}.svg`;
+    const timestamp = Date.now();
+    const randomSeed = Math.random().toString(36).substring(7);
+    // Use DiceBear Avataaars style (more reliable than iran.liara.run)
+    const randomAvatar = `https://api.dicebear.com/7.x/avataaars/svg?seed=${timestamp}-${randomSeed}&backgroundColor=b6e3f4,c0aede,d1d4f9`;
     setOnboardingData((prev) => ({
       ...prev,
       profilePic: randomAvatar,
@@ -229,11 +231,14 @@ const OnBoardingPage = () => {
                   name="location"
                   value={onboardingData.location}
                   onChange={handleInputChange}
-                  className="w-full pl-10 pr-4 py-3 bg-primary border border-gray-700 rounded-2xl focus:ring-2 focus:ring-secondary focus:border-transparent transition-all duration-300 outline-none text-white appearance-none cursor-pointer"
+                  className="w-full pl-10 pr-10 py-3 bg-[#1a1a1a] border border-gray-700 rounded-2xl focus:ring-2 focus:ring-secondary focus:border-transparent transition-all duration-300 outline-none text-white appearance-none cursor-pointer"
                   required
                   disabled={loadingCities}
+                  style={{
+                    colorScheme: "dark",
+                  }}
                 >
-                  <option value="" className="bg-primary text-gray-400">
+                  <option value="" className="bg-[#1a1a1a] text-gray-400">
                     {loadingCities
                       ? "Loading cities..."
                       : "Select your location"}
@@ -242,7 +247,7 @@ const OnBoardingPage = () => {
                     <option
                       key={index}
                       value={city}
-                      className="bg-primary text-white"
+                      className="bg-[#1a1a1a] text-white py-2"
                     >
                       {city}
                     </option>

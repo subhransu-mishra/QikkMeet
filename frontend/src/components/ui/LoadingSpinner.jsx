@@ -9,7 +9,7 @@ const LoadingSpinner = ({
 }) => {
   return (
     <div className={`flex items-center justify-center gap-3 ${className}`}>
-      <Spinner size={size} className="text-white" />
+      <Spinner size={size} className="text-white animate-spin" />
       {showText && (
         <span className="text-sm font-medium text-white">{text}</span>
       )}

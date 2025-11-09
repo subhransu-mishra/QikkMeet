@@ -106,13 +106,18 @@ const Chats = () => {
             ? ch.state.messages[ch.state.messages.length - 1]
             : null;
 
+        // limit preview to ~60 chars, single line safe
+        const rawText = lastMsg?.text || "";
+        const previewText =
+          rawText.length > 60 ? `${rawText.slice(0, 60)}…` : rawText;
+
         meta[otherId] = {
           lastMessageAt:
             ch.state.last_message_at ||
             lastMsg?.created_at ||
             ch.state.updated_at ||
             null,
-          lastMessageText: lastMsg?.text || "",
+          lastMessageText: previewText,
         };
       });
 
@@ -164,20 +169,21 @@ const Chats = () => {
   }
 
   return (
-    <div className="max-w-3xl mx-auto space-y-4">
-      <h1 className="text-2xl font-bold">Chats</h1>
+    // Full-bleed on small; center only on md+
+    <div className="w-full md:max-w-3xl md:mx-auto space-y-3 sm:space-y-4 px-0 sm:px-2 md:px-0">
+      <h1 className="text-2xl font-bold px-3 sm:px-0">Chats</h1>
 
       {sortedFriends.length === 0 ? (
-        <div className="bg-dark-card border border-gray-800 rounded-xl p-6 text-gray-400">
+        <div className="bg-black border border-white/10 rounded-xl p-4 sm:p-6 text-gray-400 mx-0 sm:mx-0">
           No friends yet. Connect with people to start chatting.
         </div>
       ) : (
-        <ul className="space-y-3">
+        <ul className="space-y-2 sm:space-y-3">
           {sortedFriends.map((f) => (
-            <li key={f._id}>
+            <li key={f._id} className="px-0 sm:px-0">
               <Link
                 to={`/chat/${f._id}`}
-                className="flex items-center gap-4 bg-dark-card border border-gray-800 rounded-2xl p-4 hover:border-secondary/60 transition-colors"
+                className="flex items-center gap-3 sm:gap-4 bg-black border border-white/10 rounded-xl sm:rounded-2xl p-3 sm:p-4 hover:border-white/30 transition-colors"
               >
                 <img
                   src={
@@ -185,12 +191,12 @@ const Chats = () => {
                     "https://avatar.iran.liara.run/public/avatars/10.svg"
                   }
                   alt={f.fullName}
-                  className="w-12 h-12 rounded-full object-cover"
+                  className="w-11 h-11 sm:w-12 sm:h-12 rounded-full object-cover"
                 />
                 <div className="min-w-0 flex-1">
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-center justify-between gap-2">
                     <p className="font-semibold truncate">{f.fullName}</p>
-                    <span className="text-xs text-gray-400 ml-3 flex-shrink-0">
+                    <span className="text-xs text-gray-400 flex-shrink-0">
                       {f.lastMessageAt ? formatTime(f.lastMessageAt) : ""}
                     </span>
                   </div>
@@ -198,8 +204,8 @@ const Chats = () => {
                     {f.lastMessageText || "Start the conversation"}
                   </p>
                 </div>
-                <span className="ml-2 inline-flex items-center justify-center rounded-full bg-secondary text-secondary-foreground px-3 py-2 text-[12px] font-bold">
-                  <FaComments className="text-secondary-foreground" />
+                <span className="ml-2 hidden sm:inline-flex items-center justify-center rounded-full bg-white text-black px-3 py-2 text-[12px] font-bold">
+                  <FaComments />
                 </span>
               </Link>
             </li>

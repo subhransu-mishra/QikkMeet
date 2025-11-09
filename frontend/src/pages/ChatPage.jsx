@@ -16,6 +16,7 @@ import { FaVideo, FaCopy, FaTimes } from "react-icons/fa";
 import "stream-chat-react/dist/css/v2/index.css";
 import toast from "react-hot-toast";
 import { motion, AnimatePresence } from "framer-motion";
+import { connectStreamUser } from "../lib/streamChat";
 
 const ChatPage = () => {
   const { id: chatWithUserId } = useParams();
@@ -42,31 +43,21 @@ const ChatPage = () => {
   useEffect(() => {
     if (!authUser || !streamTokenData?.token) return;
 
-    const apiKey = import.meta.env.VITE_STREAM_API_KEY;
-    if (!apiKey) {
-      console.error(
-        "Stream API key is missing. Check VITE_STREAM_API_KEY env."
-      );
-      return;
-    }
-    const sc = StreamChat.getInstance(apiKey);
-
     let mounted = true;
 
     (async () => {
       try {
-        if (sc.userID !== authUser.id) {
-          await sc.connectUser(
-            {
-              id: authUser.id,
-              name: authUser.fullName,
-              image: authUser.profilePic,
-            },
-            streamTokenData.token
-          );
-        }
+        const client = await connectStreamUser(
+          {
+            id: authUser.id,
+            name: authUser.fullName,
+            image: authUser.profilePic,
+          },
+          streamTokenData.token
+        );
+
         if (!mounted) return;
-        setChatClient(sc);
+        setChatClient(client);
       } catch (err) {
         console.error("Stream connect error:", err);
       }
@@ -74,6 +65,7 @@ const ChatPage = () => {
 
     return () => {
       mounted = false;
+      // Don't disconnect here - keep connection alive across page navigation
     };
   }, [authUser, streamTokenData]);
 

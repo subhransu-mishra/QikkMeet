@@ -8,20 +8,26 @@ const streamClient = new StreamClient(
 
 export const getCallToken = async (req, res) => {
   try {
-    const userId = req.user.id;
-    const callId = req.params.callId;
+    if (!req.user?.id) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+    const { callId } = req.params;
+    if (!callId) {
+      return res.status(400).json({ message: "Missing callId" });
+    }
 
-    // Generate a video call token
+    // Generate a call-scoped token (video SDK can also use user token; here we keep call token path)
     const token = streamClient.generateCallToken({
-      user_id: userId,
+      user_id: req.user.id,
       call_cids: [`default:${callId}`],
     });
 
-    res.status(200).json({
+    return res.status(200).json({
       token,
-      userId,
+      userId: req.user.id,
       fullName: req.user.fullName,
       profilePic: req.user.profilePic,
+      callId,
     });
   } catch (error) {
     console.error("Error generating call token:", error);
@@ -32,6 +38,9 @@ export const getCallToken = async (req, res) => {
 export const endCall = async (req, res) => {
   try {
     const { callId } = req.params;
+    if (!callId) {
+      return res.status(400).json({ message: "Missing callId" });
+    }
     const streamVideo = streamClient.video();
     const call = streamVideo.call("default", callId);
     await call.end();

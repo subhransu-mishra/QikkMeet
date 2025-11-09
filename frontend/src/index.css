@@ -15,11 +15,27 @@
   input::placeholder {
     color: #9ca3af;
   }
+
+  /* Force dark styling for select dropdowns */
+  select {
+    color-scheme: dark;
+  }
+
+  select option {
+    background-color: #1a1a1a;
+    color: #ffffff;
+    padding: 8px;
+  }
+
+  /* Safe area insets for mobile devices with notches */
+  .safe-area-inset-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
 }
 
 /* Stream Chat overrides */
 @layer components {
-  /* Set dark background to match bg-primary across chat surfaces */
+  /* Stream Chat - unify to pure black */
   .str-chat,
   .str-chat__theme-dark,
   .str-chat__channel,
@@ -29,28 +45,53 @@
   .str-chat__list,
   .str-chat__date-separator,
   .str-chat__thread,
-  .str-chat__virtual-message-list {
-    background-color: #212121 !important; /* bg-primary */
+  .str-chat__virtual-message-list,
+  .str-chat__container,
+  .str-chat__panel {
+    background-color: #000000 !important;
+    color: #ffffff !important;
   }
 
-  /* Message input area background + subtle top border */
+  /* Ensure text is visible in chat */
+  .str-chat__message-text,
+  .str-chat__message-text-inner,
+  .str-chat__message,
+  .str-chat__message-simple,
+  .str-chat__message-simple__text,
+  .str-chat__message__text {
+    color: #ffffff !important;
+  }
+
+  /* Ensure message bubbles are visible */
+  .str-chat__message-simple__text,
+  .str-chat__message-simple__text-inner {
+    color: #ffffff !important;
+  }
+
+  /* Message input area - black with subtle border */
   .str-chat__message-input,
   .str-chat__message-input-flat,
   .str-chat__message-input--emojis {
-    background-color: #212121 !important; /* bg-primary */
-    border-top: 1px solid #3f3f3f;
+    background-color: #000000 !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
   }
 
-  /* Send button styles (rounded, #eff3f4 background, dark text) */
+  /* Send button - improved look */
   .str-chat__message-input__send-button button,
   .str-chat__send-button,
   .str-chat__message-input__button--send,
   button[data-testid="send-button"],
   button[data-testid="message-input-send-button"] {
-    background-color: #eff3f4 !important;
-    color: #212121 !important; /* secondary-foreground */
-    border-radius: 9999px !important; /* rounded-full */
-    transition: filter 150ms ease;
+    background-color: #ffffff !important;
+    color: #000000 !important;
+    width: 48px !important;
+    height: 48px !important;
+    min-width: 48px !important;
+    min-height: 48px !important;
+    border-radius: 9999px !important;
+    border: none !important;
+    box-shadow: 0 6px 16px rgba(255, 255, 255, 0.08) !important;
+    transition: transform 150ms ease, filter 150ms ease !important;
   }
 
   .str-chat__message-input__send-button button:hover,
@@ -59,56 +100,150 @@
   button[data-testid="send-button"]:hover,
   button[data-testid="message-input-send-button"]:hover {
     filter: brightness(0.95);
+    transform: translateY(-1px);
   }
 
-  /* Ensure send icon is dark on light button */
   .str-chat__message-input__send-button button svg,
   .str-chat__send-button svg,
   .str-chat__message-input__button--send svg,
   button[data-testid="send-button"] svg,
   button[data-testid="message-input-send-button"] svg {
-    color: #212121 !important;
+    color: #000000 !important;
     fill: currentColor !important;
+    width: 22px !important;
+    height: 22px !important;
+  }
+
+  /* Remove unwanted paddings/margins on small devices */
+  @media (max-width: 768px) {
+    .str-chat__container,
+    .str-chat__window,
+    .str-chat__main-panel,
+    .str-chat__list,
+    .str-chat__message-list {
+      padding: 0 !important;
+      margin: 0 !important;
+      border: 0 !important;
+    }
+
+    .str-chat__message-input,
+    .str-chat__message-input-flat {
+      padding-left: 8px !important;
+      padding-right: 8px !important;
+      border-radius: 0 !important;
+    }
   }
 }
 
-/* Stream Video SDK - Only minimal background overrides */
+/* Stream Video SDK - SIMPLIFIED APPROACH */
 @layer components {
-  /* Only override the background, let Stream handle the buttons */
+  /* Just override backgrounds, let Stream handle buttons natively */
+  .str-video {
+    --str-video__primary-color: #ffffff;
+    --str-video__secondary-color: rgba(255, 255, 255, 0.1);
+  }
+
   .str-video__call-controls {
-    background: rgba(33, 33, 33, 0.95) !important;
+    background: rgba(0, 0, 0, 0.8) !important;
     backdrop-filter: blur(10px);
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 20px !important;
   }
 
-  /* Speaker layout background */
   .str-video__speaker-layout {
-    background: #1a1a1a !important;
+    background: #000000 !important;
   }
 
-  /* Participant video tiles */
   .str-video__participant-view {
     border-radius: 12px !important;
-    overflow: hidden !important;
     border: 2px solid rgba(255, 255, 255, 0.1) !important;
   }
 
-  /* Participant name label */
+  /* Don't override button colors - let Stream SDK handle them */
+}
+
+/* Stream Video SDK - FORCE BUTTON VISIBILITY */
+@layer components {
+  /* CRITICAL: Make all call control buttons visible */
+  .str-video__call-controls button,
+  .str-video__call-controls__button,
+  .str-video__composite-button {
+    background: #ffffff !important;
+    color: #000000 !important;
+    border: none !important;
+    border-radius: 50% !important;
+    width: 56px !important;
+    height: 56px !important;
+    min-width: 56px !important;
+    min-height: 56px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    transition: all 0.2s ease !important;
+    margin: 0 8px !important;
+  }
+
+  .str-video__call-controls button:hover,
+  .str-video__call-controls__button:hover,
+  .str-video__composite-button:hover {
+    background: #e5e5e5 !important;
+    transform: scale(1.1) !important;
+  }
+
+  /* Icons inside buttons must be black and centered */
+  .str-video__call-controls button svg,
+  .str-video__call-controls__button svg,
+  .str-video__composite-button svg {
+    color: #000000 !important;
+    fill: #000000 !important;
+    width: 24px !important;
+    height: 24px !important;
+    margin: auto !important;
+  }
+
+  /* Leave/End call button - RED with better visibility */
+  .str-video__call-controls button[data-testid*="leave"],
+  .str-video__call-controls button[data-testid*="hangup"],
+  .str-video__call-controls__button--leave,
+  button[aria-label*="Leave"],
+  button[aria-label*="leave"] {
+    background: #ef4444 !important;
+    color: #ffffff !important;
+  }
+
+  .str-video__call-controls button[data-testid*="leave"] svg,
+  .str-video__call-controls button[data-testid*="hangup"] svg,
+  .str-video__call-controls__button--leave svg,
+  button[aria-label*="Leave"] svg,
+  button[aria-label*="leave"] svg {
+    color: #ffffff !important;
+    fill: #ffffff !important;
+  }
+
+  /* Ensure controls bar is visible and well-spaced */
+  .str-video__call-controls {
+    background: rgba(0, 0, 0, 0.9) !important;
+    padding: 24px 32px !important;
+    gap: 8px !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
+  }
+
+  /* Participant video styling */
+  .str-video__participant-view {
+    border-radius: 16px !important;
+    border: 2px solid rgba(255, 255, 255, 0.15) !important;
+    overflow: hidden !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
+  }
+
+  /* Participant name labels */
   .str-video__participant-details {
-    background: rgba(33, 33, 33, 0.8) !important;
-    backdrop-filter: blur(10px);
+    background: rgba(0, 0, 0, 0.7) !important;
+    backdrop-filter: blur(8px) !important;
     border-radius: 8px !important;
-    padding: 6px 12px !important;
-  }
-
-  /* Video placeholder when camera is off */
-  .str-video__video-placeholder {
-    background: #2a2a2a !important;
-  }
-
-  /* Active speaker indicator */
-  .str-video__participant-view--active-speaker {
-    border-color: #eff3f4 !important;
-    box-shadow: 0 0 0 3px rgba(239, 243, 244, 0.3) !important;
+    padding: 8px 12px !important;
+    font-weight: 500 !important;
   }
 }

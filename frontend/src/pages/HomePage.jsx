@@ -13,6 +13,7 @@ import {
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useAuth } from "../hooks/useAuth"; // [ADD] import
+import { Avatar } from "../components/ui/Avatar";
 
 const HomePage = () => {
   const queryClient = useQueryClient();
@@ -132,12 +133,10 @@ const HomePage = () => {
                 className="bg-[#0a0a0a] border border-white/10 rounded-2xl p-5 shadow-lg hover:shadow-white/5 transition-shadow"
               >
                 <div className="flex items-center gap-4">
-                  <img
-                    src={
-                      f.profilePic ||
-                      "https://avatar.iran.liara.run/public/avatars/1.svg"
-                    }
+                  <Avatar
+                    src={f.profilePic}
                     alt={f.fullName}
+                    fallbackText={f.fullName}
                     className="w-12 h-12 rounded-full object-cover ring-2 ring-white/10"
                   />
                   <div className="min-w-0">

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { useQuery } from "@tanstack/react-query";
@@ -8,12 +8,12 @@ import {
   StreamCall,
   CallControls,
   SpeakerLayout,
-  StreamVideoClient,
 } from "@stream-io/video-react-sdk";
 import toast from "react-hot-toast";
 import { LoadingSpinner } from "../components/ui/LoadingSpinner";
 import "@stream-io/video-react-sdk/dist/css/styles.css";
-import { FaPhone, FaPhoneSlash, FaVideo } from "react-icons/fa";
+import { FaVideo } from "react-icons/fa";
+import { getStreamVideoClient } from "../lib/streamVideo";
 
 const CallPage = () => {
   const [searchParams] = useSearchParams();
@@ -25,8 +25,7 @@ const CallPage = () => {
   const [client, setClient] = useState(null);
   const [call, setCall] = useState(null);
   const [isConnecting, setIsConnecting] = useState(true);
-  const [incomingCall, setIncomingCall] = useState(null);
-  const [isCallActive, setIsCallActive] = useState(false);
+  const [tokenError, setTokenError] = useState(null);
 
   // Use callId from URL or generate one
   const callId = useMemo(() => {
@@ -37,7 +36,13 @@ const CallPage = () => {
   }, [authUser?.id, callWithUserId, urlCallId]);
 
   // Get Stream video token
-  const { data: streamTokenData, isLoading: tokenLoading } = useQuery({
+  const {
+    data: streamTokenData,
+    isLoading: tokenLoading,
+    isError: tokenIsError,
+    error: tokenErrObj,
+    refetch: refetchToken,
+  } = useQuery({
     queryKey: ["streamVideoToken", callId],
     queryFn: async () => {
       const res = await axiosInstance.get(`/calls/${callId}/token`);
@@ -46,8 +51,18 @@ const CallPage = () => {
     enabled: !!authUser && !!callId,
   });
 
+  // Early abort if token fetch failed
   useEffect(() => {
-    let videoClient = null;
+    if (tokenIsError) {
+      setTokenError(
+        tokenErrObj?.response?.data?.message ||
+          "Failed to fetch call token. Try again."
+      );
+      setIsConnecting(false);
+    }
+  }, [tokenIsError, tokenErrObj]);
+
+  useEffect(() => {
     let callInstance = null;
     let mounted = true;
     let participantCheckInterval = null;
@@ -55,35 +70,29 @@ const CallPage = () => {
     const initCall = async () => {
       if (!authUser || !callWithUserId || !streamTokenData?.token || !callId)
         return;
+      if (tokenIsError) return; // don't proceed if token failed
 
       try {
-        // Create Stream Video Client
-        videoClient = new StreamVideoClient({
-          apiKey: import.meta.env.VITE_STREAM_API_KEY,
-          user: {
+        const videoClient = await getStreamVideoClient(
+          {
             id: authUser.id,
             name: authUser.fullName,
             image: authUser.profilePic,
           },
-          token: streamTokenData.token,
-        });
+          streamTokenData.token
+        );
 
-        if (!mounted) return;
+        if (!mounted || !videoClient) return;
         setClient(videoClient);
 
-        // Create call instance
         callInstance = videoClient.call("default", callId);
 
-        // Get unique members
         const uniqueMembers = [...new Set([authUser.id, callWithUserId])];
 
-        // First try to get existing call
         try {
           await callInstance.get();
-          // Call exists, just join it
           await callInstance.join();
-        } catch (error) {
-          // Call doesn't exist, create it
+        } catch {
           await callInstance.getOrCreate({
             data: {
               members: uniqueMembers.map((id) => ({ user_id: id })),
@@ -94,49 +103,39 @@ const CallPage = () => {
 
         if (!mounted) return;
         setCall(callInstance);
-        setIsCallActive(true);
         setIsConnecting(false);
 
-        // Check participant count periodically
+        // Watch participants; if alone, leave and go back to chat
         participantCheckInterval = setInterval(() => {
           const participants = callInstance.state.participants;
-          const participantCount = Object.keys(participants).length;
-
-          // If only 1 participant (current user), end the call
-          if (participantCount === 1) {
+          const count = Object.keys(participants).length;
+          if (count === 1) {
             toast.info("Other participant left. Ending call...");
             clearInterval(participantCheckInterval);
-            callInstance.leave().then(() => {
-              if (mounted) {
-                handleCallEnd();
-              }
+            callInstance.leave().finally(() => {
+              if (mounted) navigate(`/chat/${callWithUserId}`);
             });
           }
-        }, 2000); // Check every 2 seconds
+        }, 2000);
 
-        // Event listeners - redirect to specific chat after call
+        // End/leave handlers -> redirect to chat
         callInstance.on("call.session_ended", async () => {
           if (!mounted) return;
-          clearInterval(participantCheckInterval);
-          handleCallEnd();
+          if (participantCheckInterval) clearInterval(participantCheckInterval);
+          toast.info("Call ended");
+          navigate(`/chat/${callWithUserId}`);
         });
 
         callInstance.on("call.ended", async () => {
           if (!mounted) return;
-          clearInterval(participantCheckInterval);
-          handleCallEnd();
+          if (participantCheckInterval) clearInterval(participantCheckInterval);
+          toast.info("Call ended");
+          navigate(`/chat/${callWithUserId}`);
         });
 
         callInstance.on("call.leave", async () => {
           if (!mounted) return;
           toast.info("Participant left the call");
-        });
-
-        // Add device error listener
-        callInstance.on("call.permission_request", (event) => {
-          if (event.type === "camera" && event.denied) {
-            toast.error("Camera access denied or device in use");
-          }
         });
       } catch (error) {
         console.error("Error initializing call:", error);
@@ -152,26 +151,64 @@ const CallPage = () => {
 
     return () => {
       mounted = false;
-      if (participantCheckInterval) {
-        clearInterval(participantCheckInterval);
-      }
+      if (participantCheckInterval) clearInterval(participantCheckInterval);
       const cleanup = async () => {
         try {
-          if (callInstance) {
-            await callInstance.leave();
-          }
+          if (callInstance) await callInstance.leave();
         } catch (err) {
           console.error("Cleanup error:", err);
         }
       };
       cleanup();
     };
-  }, [authUser, callWithUserId, callId, streamTokenData, navigate]);
+  }, [
+    authUser,
+    callWithUserId,
+    callId,
+    streamTokenData,
+    navigate,
+    tokenIsError,
+  ]);
+
+  // Retry on token error
+  const handleRetry = () => {
+    setTokenError(null);
+    setIsConnecting(true);
+    refetchToken();
+  };
 
   if (tokenLoading || isConnecting) {
     return (
       <div className="h-screen flex items-center justify-center bg-black">
         <LoadingSpinner text="Connecting..." size="lg" />
+      </div>
+    );
+  }
+
+  if (tokenError) {
+    return (
+      <div className="h-screen flex items-center justify-center bg-black px-6">
+        <div className="max-w-md w-full text-center space-y-5">
+          <p className="text-red-400 font-semibold">{tokenError}</p>
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            <button
+              onClick={handleRetry}
+              className="px-6 py-3 rounded-full bg-white text-black font-semibold hover:bg-white/90 transition"
+            >
+              Retry
+            </button>
+            <button
+              onClick={() =>
+                callWithUserId
+                  ? navigate(`/chat/${callWithUserId}`)
+                  : navigate("/chat")
+              }
+              className="px-6 py-3 rounded-full bg-white/10 text-white font-semibold hover:bg-white/20 transition"
+            >
+              Back to Chat
+            </button>
+          </div>
+        </div>
       </div>
     );
   }
@@ -182,7 +219,11 @@ const CallPage = () => {
         <div className="text-center">
           <p className="text-red-400 mb-4">Failed to connect to call</p>
           <button
-            onClick={() => navigate("/chat")}
+            onClick={() =>
+              callWithUserId
+                ? navigate(`/chat/${callWithUserId}`)
+                : navigate("/chat")
+            }
             className="px-6 py-2 bg-white text-black rounded-full hover:bg-white/90 transition"
           >
             Return to Chat
@@ -191,11 +232,6 @@ const CallPage = () => {
       </div>
     );
   }
-
-  const handleCallEnd = () => {
-    toast.info("Call ended");
-    navigate(`/chat/${callWithUserId}`);
-  };
 
   return (
     <div className="h-screen bg-black">
@@ -213,7 +249,12 @@ const CallPage = () => {
               <SpeakerLayout />
             </div>
             <div className="px-6 py-4 bg-black/60">
-              <CallControls onLeave={handleCallEnd} />
+              <CallControls
+                onLeave={() => {
+                  // Always go back to chat when user leaves
+                  navigate(`/chat/${callWithUserId}`);
+                }}
+              />
             </div>
           </div>
         </StreamCall>

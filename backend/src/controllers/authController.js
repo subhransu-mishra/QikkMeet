@@ -34,9 +34,24 @@ export const signup = async (req, res) => {
       return res.status(400).json({ message: "Email already exists" });
     }
 
-    // Create random avatar
-    const idx = Math.floor(Math.random() * 100) + 1;
-    const randomAvatar = `https://avatar.iran.liara.run/public/avatars/${idx}.svg`;
+    // Use more reliable avatar services with fallbacks
+    const generateAvatar = () => {
+      const randomNum = Math.floor(Math.random() * 100) + 1;
+      // Try multiple avatar services as fallbacks
+      const avatarServices = [
+        `https://api.dicebear.com/7.x/avataaars/svg?seed=${email}`,
+        `https://ui-avatars.com/api/?name=${encodeURIComponent(
+          fullName
+        )}&background=random&size=200`,
+        `https://robohash.org/${email}?set=set4&size=200x200`,
+        `https://avatar.iran.liara.run/public/boy?username=${encodeURIComponent(
+          email
+        )}`,
+      ];
+      return avatarServices[0]; // Use first one as primary
+    };
+
+    const randomAvatar = generateAvatar();
 
     // Create new user
     const newUser = new User({
@@ -59,7 +74,6 @@ export const signup = async (req, res) => {
 
     // Generate token
     const token = generateToken(newUser._id);
-
     // Send token in response
     res.status(201).json({
       message: "User created successfully",
