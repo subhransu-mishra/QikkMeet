@@ -135,115 +135,184 @@
   }
 }
 
-/* Stream Video SDK - SIMPLIFIED APPROACH */
-@layer components {
-  /* Just override backgrounds, let Stream handle buttons natively */
-  .str-video {
-    --str-video__primary-color: #ffffff;
-    --str-video__secondary-color: rgba(255, 255, 255, 0.1);
-  }
+/* Stream Video SDK - Complete Override for Dark Theme */
+/* CRITICAL: Stream's CSS is imported in main.jsx BEFORE this file */
 
-  .str-video__call-controls {
-    background: rgba(0, 0, 0, 0.8) !important;
-    backdrop-filter: blur(10px);
-    padding: 20px !important;
-  }
-
-  .str-video__speaker-layout {
-    background: #000000 !important;
-  }
-
-  .str-video__participant-view {
-    border-radius: 12px !important;
-    border: 2px solid rgba(255, 255, 255, 0.1) !important;
-  }
-
-  /* Don't override button colors - let Stream SDK handle them */
+/* Set CSS variables for Stream Video theme - following official docs */
+.str-video {
+  --str-video__primary-color: #ffffff;
+  --str-video__secondary-color: #000000;
+  --str-video__background-color: #000000;
+  --str-video__text-color: #ffffff;
+  
+  /* Button colors */
+  --str-video__call-controls-button-color: #ffffff;
+  --str-video__call-controls-button-background-color: #ffffff;
+  
+  /* Icon colors */
+  --str-video__icon-color: #000000;
 }
 
-/* Stream Video SDK - FORCE BUTTON VISIBILITY */
-@layer components {
-  /* CRITICAL: Make all call control buttons visible */
-  .str-video__call-controls button,
-  .str-video__call-controls__button,
-  .str-video__composite-button {
-    background: #ffffff !important;
-    color: #000000 !important;
-    border: none !important;
-    border-radius: 50% !important;
-    width: 56px !important;
-    height: 56px !important;
-    min-width: 56px !important;
-    min-height: 56px !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    transition: all 0.2s ease !important;
-    margin: 0 8px !important;
-  }
+/* Main video container */
+.str-video,
+.str-video__container {
+  background: #000000 !important;
+  color: #ffffff !important;
+}
 
-  .str-video__call-controls button:hover,
-  .str-video__call-controls__button:hover,
-  .str-video__composite-button:hover {
-    background: #e5e5e5 !important;
-    transform: scale(1.1) !important;
-  }
+/* Speaker layout background */
+.str-video__speaker-layout,
+.str-video__speaker-layout__wrapper {
+  background: #000000 !important;
+}
 
-  /* Icons inside buttons must be black and centered */
-  .str-video__call-controls button svg,
-  .str-video__call-controls__button svg,
-  .str-video__composite-button svg {
-    color: #000000 !important;
-    fill: #000000 !important;
-    width: 24px !important;
-    height: 24px !important;
-    margin: auto !important;
-  }
+/* Call controls container - dark background at bottom */
+.str-video__call-controls,
+.str-video__call-controls__wrapper {
+  background: rgba(0, 0, 0, 0.95) !important;
+  backdrop-filter: blur(10px) !important;
+  padding: 20px 24px !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  gap: 12px !important;
+}
 
-  /* Leave/End call button - RED with better visibility */
-  .str-video__call-controls button[data-testid*="leave"],
-  .str-video__call-controls button[data-testid*="hangup"],
-  .str-video__call-controls__button--leave,
-  button[aria-label*="Leave"],
-  button[aria-label*="leave"] {
-    background: #ef4444 !important;
-    color: #ffffff !important;
-  }
+/* CRITICAL FIX: All call control buttons - white background with black icons */
+.str-video__call-controls button,
+.str-video__call-controls__button,
+.str-video__composite-button,
+.str-video button[class*="button"],
+button[class*="str-video__"],
+.str-video [role="button"] {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+  border: none !important;
+  border-radius: 50% !important;
+  width: 56px !important;
+  height: 56px !important;
+  min-width: 56px !important;
+  min-height: 56px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transition: all 0.2s ease !important;
+  cursor: pointer !important;
+  padding: 0 !important;
+  margin: 0 4px !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
+}
 
-  .str-video__call-controls button[data-testid*="leave"] svg,
-  .str-video__call-controls button[data-testid*="hangup"] svg,
-  .str-video__call-controls__button--leave svg,
-  button[aria-label*="Leave"] svg,
-  button[aria-label*="leave"] svg {
-    color: #ffffff !important;
-    fill: #ffffff !important;
-  }
+/* Button hover state */
+.str-video__call-controls button:hover,
+.str-video__call-controls__button:hover,
+.str-video__composite-button:hover,
+button[class*="str-video"][class*="button"]:hover {
+  background-color: #e5e5e5 !important;
+  transform: scale(1.05) !important;
+}
 
-  /* Ensure controls bar is visible and well-spaced */
-  .str-video__call-controls {
-    background: rgba(0, 0, 0, 0.9) !important;
-    padding: 24px 32px !important;
-    gap: 8px !important;
-    display: flex !important;
-    justify-content: center !important;
-    align-items: center !important;
-    border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
-  }
+/* CRITICAL: SVG icons inside buttons - must be black and visible */
+.str-video__call-controls button svg,
+.str-video__call-controls__button svg,
+.str-video__composite-button svg,
+button[class*="str-video"] svg,
+.str-video__icon,
+.str-video__call-controls svg,
+.str-video [role="button"] svg,
+.str-video button svg {
+  color: #000000 !important;
+  fill: #000000 !important;
+  stroke: #000000 !important;
+  width: 24px !important;
+  height: 24px !important;
+  min-width: 24px !important;
+  min-height: 24px !important;
+}
 
-  /* Participant video styling */
-  .str-video__participant-view {
-    border-radius: 16px !important;
-    border: 2px solid rgba(255, 255, 255, 0.15) !important;
-    overflow: hidden !important;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
-  }
+/* SVG paths inside icons - force black color */
+.str-video__call-controls button svg path,
+.str-video__call-controls svg path,
+.str-video button svg path,
+.str-video [role="button"] svg path {
+  fill: #000000 !important;
+  stroke: #000000 !important;
+}
 
-  /* Participant name labels */
-  .str-video__participant-details {
-    background: rgba(0, 0, 0, 0.7) !important;
-    backdrop-filter: blur(8px) !important;
-    border-radius: 8px !important;
-    padding: 8px 12px !important;
-    font-weight: 500 !important;
-  }
+/* Active/pressed state for buttons */
+.str-video__call-controls button[data-active="true"],
+.str-video__call-controls button.active,
+button[class*="str-video"][class*="button"][data-active="true"] {
+  background-color: #3b82f6 !important;
+}
+
+.str-video__call-controls button[data-active="true"] svg,
+button[class*="str-video"][class*="button"][data-active="true"] svg {
+  color: #ffffff !important;
+  fill: #ffffff !important;
+  stroke: #ffffff !important;
+}
+
+/* Leave/Hangup button - RED background with white icon */
+.str-video__call-controls button[data-testid*="leave"],
+.str-video__call-controls button[data-testid*="hangup"],
+.str-video__call-controls__button--leave,
+button[aria-label*="Leave"],
+button[aria-label*="leave"],
+button[class*="leave"],
+button[class*="hangup"] {
+  background-color: #ef4444 !important;
+}
+
+.str-video__call-controls button[data-testid*="leave"]:hover,
+.str-video__call-controls button[data-testid*="hangup"]:hover,
+button[aria-label*="Leave"]:hover,
+button[aria-label*="leave"]:hover {
+  background-color: #dc2626 !important;
+}
+
+.str-video__call-controls button[data-testid*="leave"] svg,
+.str-video__call-controls button[data-testid*="hangup"] svg,
+button[aria-label*="Leave"] svg,
+button[aria-label*="leave"] svg,
+button[class*="leave"] svg,
+button[class*="hangup"] svg {
+  color: #ffffff !important;
+  fill: #ffffff !important;
+  stroke: #ffffff !important;
+}
+
+/* Participant video tiles */
+.str-video__participant-view,
+.str-video__participant-tile {
+  border-radius: 12px !important;
+  border: 2px solid rgba(255, 255, 255, 0.1) !important;
+  overflow: hidden !important;
+  background: #1a1a1a !important;
+}
+
+/* Participant name labels */
+.str-video__participant-details,
+.str-video__participant-label {
+  background: rgba(0, 0, 0, 0.8) !important;
+  backdrop-filter: blur(8px) !important;
+  color: #ffffff !important;
+  padding: 6px 12px !important;
+  border-radius: 6px !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+}
+
+/* Video element itself */
+.str-video__participant-view video {
+  object-fit: cover !important;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* Ensure proper z-index for controls */
+.str-video__call-controls {
+  position: relative !important;
+  z-index: 10 !important;
 }

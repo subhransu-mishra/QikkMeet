@@ -10,6 +10,7 @@ import {
 } from "react-icons/fa";
 import { useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
+import { Logo } from "../ui/Logo";
 
 const Sidebar = () => {
   const location = useLocation();
@@ -33,14 +34,11 @@ const Sidebar = () => {
   return (
     <>
       {/* Desktop Sidebar - Hidden on mobile */}
-      <div className="hidden lg:flex w-64 bg-black h-full flex-col shadow-lg z-10">
+      <div className="hidden lg:flex w-64 bg-black h-full flex-col shadow-lg z-10 border-r border-white/10">
         {/* Logo */}
-        <div className="h-16 flex items-center justify-start px-4 border-b border-white/10">
-          <Link to="/" className="flex items-center space-x-2">
-            <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center">
-              <FaVideo className="text-black text-xl" />
-            </div>
-            <span className="text-xl font-bold text-white">QikMeet</span>
+        <div className="h-16 flex items-center justify-center px-4 border-b border-white/10">
+          <Link to="/" className="flex items-center justify-center w-full">
+            <Logo className="h-8 text-white hover:scale-105 transition-transform duration-200" />
           </Link>
         </div>
 

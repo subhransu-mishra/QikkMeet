@@ -9,11 +9,21 @@ const streamClient = new StreamClient(
 export const getCallToken = async (req, res) => {
   try {
     if (!req.user?.id) {
+      console.error("Unauthorized call token request - no user");
       return res.status(401).json({ message: "Unauthorized" });
     }
     const { callId } = req.params;
     if (!callId) {
+      console.error("Missing callId in token request");
       return res.status(400).json({ message: "Missing callId" });
+    }
+
+    console.log(`Generating call token for user ${req.user.id} and call ${callId}`);
+
+    // Verify Stream credentials are available
+    if (!process.env.STREAM_API_KEY || !process.env.STREAM_API_SECRET) {
+      console.error("Stream API credentials missing in environment");
+      return res.status(500).json({ message: "Server configuration error" });
     }
 
     // Generate a call-scoped token (video SDK can also use user token; here we keep call token path)
@@ -21,6 +31,8 @@ export const getCallToken = async (req, res) => {
       user_id: req.user.id,
       call_cids: [`default:${callId}`],
     });
+
+    console.log(`Successfully generated call token for user ${req.user.id}`);
 
     return res.status(200).json({
       token,
@@ -31,7 +43,11 @@ export const getCallToken = async (req, res) => {
     });
   } catch (error) {
     console.error("Error generating call token:", error);
-    res.status(500).json({ message: "Failed to generate call token" });
+    console.error("Error stack:", error.stack);
+    res.status(500).json({ 
+      message: "Failed to generate call token",
+      error: process.env.NODE_ENV === "development" ? error.message : undefined
+    });
   }
 };
 

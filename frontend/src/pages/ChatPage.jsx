@@ -72,9 +72,9 @@ const ChatPage = () => {
   useEffect(() => {
     if (!chatClient || !chatWithUserId || !authUser) return;
 
-    // Prevent chatting with yourself
+    // Prevent chatting with yourself only if explicitly navigating to /chat/:selfId
     if (chatWithUserId === authUser.id) {
-      toast.error("You cannot chat with yourself");
+      toast.error("You cannot open a conversation with yourself");
       navigate("/chat", { replace: true });
       return;
     }
