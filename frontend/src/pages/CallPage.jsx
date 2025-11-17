@@ -8,6 +8,7 @@ import {
   StreamCall,
   CallControls,
   SpeakerLayout,
+  ParticipantView,
 } from "@stream-io/video-react-sdk";
 import { getStreamVideoClient } from "../lib/streamVideo";
 import { LoadingSpinner } from "../components/ui/LoadingSpinner";
@@ -84,6 +85,7 @@ const CallPage = () => {
   const [connecting, setConnecting] = useState(false);
   const [tokenError, setTokenError] = useState(null);
   const [startTime, setStartTime] = useState(null);
+  const [participantInfo, setParticipantInfo] = useState(null);
 
   // Fetch call token only in active call mode
   const {
@@ -123,16 +125,26 @@ const CallPage = () => {
     let callStartTime = null;
     setConnecting(true);
 
+    // Store participant info
+    if (callTokenData.participant) {
+      setParticipantInfo(callTokenData.participant);
+    }
+
     (async () => {
       try {
         // Request camera and microphone permissions
         console.log("Requesting media permissions...");
         try {
-          await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+          await navigator.mediaDevices.getUserMedia({
+            video: true,
+            audio: true,
+          });
           console.log("Media permissions granted");
         } catch (permErr) {
           console.error("Media permission denied:", permErr);
-          toast.error("Camera/microphone access denied. Please allow permissions.");
+          toast.error(
+            "Camera/microphone access denied. Please allow permissions."
+          );
           setConnecting(false);
           return;
         }
@@ -142,26 +154,31 @@ const CallPage = () => {
           {
             id: authUser.id,
             name: authUser.fullName,
-            image: authUser.profilePic,
+            image:
+              authUser.profilePic ||
+              `https://avatar.iran.liara.run/public/${authUser.id}`,
           },
           callTokenData.token
         );
-        
+
         if (!mounted || !videoClient) {
           console.log("Component unmounted or client failed");
           return;
         }
-        
+
         console.log("Video client initialized successfully");
         setClient(videoClient);
 
         const streamCall = videoClient.call("default", callId);
         localCall = streamCall;
-        
+
         console.log("Attempting to join/create call:", callId);
-        
+
         // Join or create - use getOrCreate for simplicity
-        console.log("Creating/joining call with members:", [authUser.id, callWithUserId]);
+        console.log("Creating/joining call with members:", [
+          authUser.id,
+          callWithUserId,
+        ]);
         await streamCall.getOrCreate({
           data: {
             members: [authUser.id, callWithUserId]
@@ -169,14 +186,14 @@ const CallPage = () => {
               .map((id) => ({ user_id: id })),
           },
         });
-        
+
         console.log("Call created/retrieved, now joining...");
         await streamCall.join();
 
         console.log("Successfully joined call");
 
         if (!mounted) return;
-        
+
         callStartTime = new Date();
         setCall(streamCall);
         setStartTime(callStartTime);
@@ -187,7 +204,7 @@ const CallPage = () => {
           const participants = streamCall.state.participants;
           const participantCount = participants ? participants.length : 0;
           console.log("Participant count:", participantCount);
-          
+
           if (participantCount === 1) {
             console.log("Only one participant, ending call...");
             toast("Other participant left. Ending call...", {
@@ -202,8 +219,14 @@ const CallPage = () => {
                 pushCallHistory({
                   id: callId,
                   userId: callWithUserId,
-                  userName: "Participant",
-                  userProfilePic: "",
+                  userName:
+                    participantInfo?.fullName ||
+                    callTokenData?.participant?.fullName ||
+                    "Participant",
+                  userProfilePic:
+                    participantInfo?.profilePic ||
+                    callTokenData?.participant?.profilePic ||
+                    `https://avatar.iran.liara.run/public/${callWithUserId}`,
                   startTime: callStartTime,
                   endTime: new Date(),
                   duration,
@@ -213,7 +236,7 @@ const CallPage = () => {
             });
           }
         };
-        
+
         interval = setInterval(checkParticipants, 2500);
 
         // End events
@@ -226,8 +249,14 @@ const CallPage = () => {
           pushCallHistory({
             id: callId,
             userId: callWithUserId,
-            userName: "Participant",
-            userProfilePic: "",
+            userName:
+              participantInfo?.fullName ||
+              callTokenData?.participant?.fullName ||
+              "Participant",
+            userProfilePic:
+              participantInfo?.profilePic ||
+              callTokenData?.participant?.profilePic ||
+              `https://avatar.iran.liara.run/public/${callWithUserId}`,
             startTime: callStartTime,
             endTime: new Date(),
             duration,
@@ -237,20 +266,19 @@ const CallPage = () => {
 
         streamCall.on("call.ended", finish);
         streamCall.on("call.session_ended", finish);
-        
+
         // Log when participants join/leave
         streamCall.on("call.session_participant_joined", (event) => {
           console.log("Participant joined:", event.participant?.user?.id);
         });
-        
+
         streamCall.on("call.session_participant_left", (event) => {
           console.log("Participant left:", event.participant?.user?.id);
         });
-        
       } catch (err) {
         console.error("Call init failed:", err);
         console.error("Error details:", err.message, err.stack);
-        
+
         let errorMessage = "Failed to start call";
         if (err.message?.includes("permission")) {
           errorMessage = "Camera/microphone permission denied";
@@ -259,10 +287,10 @@ const CallPage = () => {
         } else if (err.message?.includes("network")) {
           errorMessage = "Network error. Check your connection.";
         }
-        
+
         toast.error(errorMessage);
         setConnecting(false);
-        
+
         // Don't navigate away immediately on error, let user retry
         setTimeout(() => {
           if (mounted) {
@@ -292,9 +320,11 @@ const CallPage = () => {
     callWithUserId,
     callId,
     callTokenData?.token,
+    callTokenData?.participant,
     tokenIsError,
     navigate,
     pushCallHistory,
+    participantInfo,
   ]);
 
   const retryToken = () => {
@@ -356,7 +386,7 @@ const CallPage = () => {
           <StreamCall call={call}>
             <div className="h-full flex flex-col bg-black">
               <div className="flex-1 relative">
-                <SpeakerLayout />
+                <SpeakerLayout participantViewUI={ParticipantView} />
               </div>
               <div className="px-6 py-4 bg-black/60">
                 <CallControls
@@ -370,8 +400,14 @@ const CallPage = () => {
                     pushCallHistory({
                       id: callId,
                       userId: callWithUserId,
-                      userName: "Participant",
-                      userProfilePic: "",
+                      userName:
+                        participantInfo?.fullName ||
+                        callTokenData?.participant?.fullName ||
+                        "Participant",
+                      userProfilePic:
+                        participantInfo?.profilePic ||
+                        callTokenData?.participant?.profilePic ||
+                        `https://avatar.iran.liara.run/public/${callWithUserId}`,
                       startTime,
                       endTime: new Date(),
                       duration,
@@ -422,10 +458,17 @@ const CallPage = () => {
                   <img
                     src={
                       item.userProfilePic ||
-                      "https://avatar.iran.liara.run/public/avatars/10.svg"
+                      `https://avatar.iran.liara.run/public/${
+                        item.userId || "10"
+                      }`
                     }
                     alt={item.userName || "User"}
-                    className="w-14 h-14 rounded-full object-cover"
+                    className="w-14 h-14 rounded-full object-cover border-2 border-white/10"
+                    onError={(e) => {
+                      e.target.src = `https://avatar.iran.liara.run/public/${
+                        item.userId || Math.floor(Math.random() * 100)
+                      }`;
+                    }}
                   />
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between mb-2">

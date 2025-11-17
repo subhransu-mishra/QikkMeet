@@ -11,7 +11,7 @@ import {
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { axiosInstance } from "../lib/axios";
 import toast from "react-hot-toast";
-import { LoadingSpinner } from "../components/ui/LoadingSpinner";
+import { SkewLoader } from "react-spinners";
 import { motion } from "framer-motion";
 
 const SignUpPage = () => {
@@ -245,18 +245,18 @@ const SignUpPage = () => {
               <button
                 type="submit"
                 disabled={isLoading}
-                className={`w-full py-3.5 px-8 rounded-full font-semibold transition-all duration-300 cursor-pointer
+                className={`w-full py-3.5 px-8 rounded-full font-semibold transition-all duration-300 
                   ${
                     isLoading
-                      ? "bg-white/10 text-white/60 cursor-not-allowed"
-                      : "bg-white text-black hover:bg-white/90"
+                      ? "bg-white/20 text-white cursor-not-allowed"
+                      : "bg-white text-black hover:bg-white/90 hover:shadow-lg hover:shadow-white/20 cursor-pointer"
                   }
                   shadow-lg`}
               >
                 {isLoading ? (
-                  <div className="flex items-center justify-center gap-2">
-                    <LoadingSpinner size="sm" showText={false} />
-                    <span>Creating Account...</span>
+                  <div className="flex items-center justify-center gap-3">
+                    <SkewLoader color="#ffffff" size={10} />
+                    <span className="text-white">Creating Account...</span>
                   </div>
                 ) : (
                   "Sign Up"

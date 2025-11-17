@@ -1,13 +1,43 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
-import { FaVideo, FaSearch, FaCog } from "react-icons/fa";
+import React, { useState, useEffect, useRef } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { FaVideo, FaSearch, FaCog, FaSignOutAlt } from "react-icons/fa";
 import { useAuth } from "../../hooks/useAuth";
+import { useQueryClient } from "@tanstack/react-query";
+import toast from "react-hot-toast";
 import { Logo } from "../ui/Logo";
 
 const Navbar = () => {
   const [showUserMenu, setShowUserMenu] = useState(false);
   const { authUser } = useAuth();
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const menuRef = useRef(null);
   const user = authUser;
+
+  // Close menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (menuRef.current && !menuRef.current.contains(event.target)) {
+        setShowUserMenu(false);
+      }
+    };
+
+    if (showUserMenu) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [showUserMenu]);
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    queryClient.setQueryData(["authUser"], { user: null });
+    toast.success("Logged out successfully");
+    setShowUserMenu(false);
+    navigate("/login");
+  };
 
   return (
     <header className="h-16 border-b border-white/10 bg-black px-4 sm:px-6 flex items-center justify-between">
@@ -34,7 +64,7 @@ const Navbar = () => {
           <FaCog className="text-base sm:text-lg" />
         </button>
 
-        <div className="relative">
+        <div className="relative" ref={menuRef}>
           <button
             className="flex items-center space-x-2 sm:space-x-3"
             onClick={() => setShowUserMenu(!showUserMenu)}
@@ -53,7 +83,7 @@ const Navbar = () => {
                 alt="User Profile"
                 className="w-8 h-8 sm:w-10 sm:h-10 rounded-full object-cover border-2 border-white"
               />
-              <span className="absolute -bottom-10 left-1/2 transform -translate-x-1/2 bg-black px-3 py-1 rounded-lg text-xs whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300 border border-white/10 shadow-lg pointer-events-none z-50">
+              <span className="absolute -bottom-10 left-1/2 transform -translate-x-1/2 bg-black px-3 py-1 rounded-lg text-xs whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300 border border-white/10 shadow-lg pointer-events-none z-50 hidden md:block">
                 {user?.fullName || "User"}
               </span>
             </div>
@@ -61,31 +91,57 @@ const Navbar = () => {
 
           {/* User Dropdown Menu */}
           {showUserMenu && (
-            <div className="absolute right-0 top-12 w-52 bg-black rounded-lg shadow-lg py-2 z-50 border border-white/10">
-              <Link
-                to="/profile"
-                className="flex items-center space-x-3 px-4 py-2 hover:bg-white/10 transition-colors"
-              >
-                <img
-                  src={
-                    user?.profilePic ||
-                    "https://api.dicebear.com/7.x/avataaars/svg?seed=default"
-                  }
-                  alt="User Profile"
-                  className="w-8 h-8 rounded-full object-cover"
-                />
-                <span className="text-sm font-medium">My Profile</span>
-              </Link>
+            <div className="absolute right-0 top-12 w-52 bg-[#0a0a0a] rounded-xl shadow-2xl py-2 z-50 border border-white/10">
+              {/* Desktop Menu Items */}
+              <div className="hidden md:block">
+                <Link
+                  to="/profile"
+                  onClick={() => setShowUserMenu(false)}
+                  className="flex items-center space-x-3 px-4 py-2.5 hover:bg-white/10 transition-colors text-white"
+                >
+                  <img
+                    src={
+                      user?.profilePic ||
+                      "https://api.dicebear.com/7.x/avataaars/svg?seed=default"
+                    }
+                    alt="User Profile"
+                    className="w-8 h-8 rounded-full object-cover"
+                  />
+                  <span className="text-sm font-medium">My Profile</span>
+                </Link>
 
-              <div className="border-t border-white/10 my-1"></div>
+                <div className="border-t border-white/10 my-1"></div>
 
-              <Link
-                to="/settings"
-                className="flex items-center space-x-3 px-4 py-2 hover:bg-white/10 transition-colors"
-              >
-                <FaCog className="text-white/50" />
-                <span className="text-sm">Settings</span>
-              </Link>
+                <Link
+                  to="/settings"
+                  onClick={() => setShowUserMenu(false)}
+                  className="flex items-center space-x-3 px-4 py-2.5 hover:bg-white/10 transition-colors text-white"
+                >
+                  <FaCog className="text-white/50" />
+                  <span className="text-sm">Settings</span>
+                </Link>
+
+                <div className="border-t border-white/10 my-1"></div>
+
+                <button
+                  onClick={handleLogout}
+                  className="w-full flex items-center space-x-3 px-4 py-2.5 hover:bg-white/10 transition-colors text-red-400 hover:text-red-300"
+                >
+                  <FaSignOutAlt className="text-base" />
+                  <span className="text-sm font-medium">Logout</span>
+                </button>
+              </div>
+
+              {/* Mobile Menu - Only Logout Button */}
+              <div className="md:hidden">
+                <button
+                  onClick={handleLogout}
+                  className="w-full flex items-center justify-center space-x-3 px-4 py-3.5 hover:bg-white/10 transition-colors text-white"
+                >
+                  <FaSignOutAlt className="text-lg" />
+                  <span className="text-sm font-semibold">Logout</span>
+                </button>
+              </div>
             </div>
           )}
         </div>

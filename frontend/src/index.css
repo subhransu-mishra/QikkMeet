@@ -144,11 +144,11 @@
   --str-video__secondary-color: #000000;
   --str-video__background-color: #000000;
   --str-video__text-color: #ffffff;
-  
+
   /* Button colors */
   --str-video__call-controls-button-color: #ffffff;
   --str-video__call-controls-button-background-color: #ffffff;
-  
+
   /* Icon colors */
   --str-video__icon-color: #000000;
 }
@@ -315,4 +315,20 @@ button[class*="hangup"] svg {
 .str-video__call-controls {
   position: relative !important;
   z-index: 10 !important;
+}
+
+@keyframes skew-loader {
+  0%,
+  100% {
+    transform: skewX(0deg) scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: skewX(20deg) scale(0.8);
+    opacity: 0.6;
+  }
+}
+
+.animate-skew-loader {
+  animation: skew-loader 1.2s ease-in-out infinite;
 }
