@@ -3,36 +3,20 @@ import {
   signup,
   login,
   logout,
-  onboard,
+  getMe,
+  onboarding,
 } from "../controllers/authController.js";
 import { protectRoute } from "../middlewares/authMiddleware.js";
+
 const router = express.Router();
 
+// Public routes
 router.post("/signup", signup);
-
 router.post("/login", login);
-router.post("/logout", logout);
-router.post("/onboarding", protectRoute, onboard);
 
-router.get("/me", protectRoute, (req, res) => {
-  try {
-    if (!req.user) {
-      return res.status(401).json({ message: "Not authenticated" });
-    }
-    res.status(200).json({
-      user: {
-        id: req.user._id,
-        email: req.user.email,
-        fullName: req.user.fullName,
-        profilePic: req.user.profilePic,
-        bio: req.user.bio,
-        location: req.user.location,
-        isOnboarded: req.user.isOnboarded,
-      },
-    });
-  } catch (error) {
-    res.status(500).json({ message: "Server error" });
-  }
-});
+// Protected routes
+router.post("/logout", protectRoute, logout);
+router.get("/me", protectRoute, getMe);
+router.post("/onboarding", protectRoute, onboarding);
 
 export default router;

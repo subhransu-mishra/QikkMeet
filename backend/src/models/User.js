@@ -39,6 +39,18 @@ const userSchema = new mongoose.Schema(
         ref: "User",
       },
     ],
+    // Moderation fields
+    strikes: { type: Number, default: 0 },
+    isBanned: { type: Boolean, default: false },
+    bannedAt: Date,
+    violations: [
+      {
+        type: { type: String },
+        messageId: String,
+        timestamp: Date,
+        reason: String,
+      },
+    ],
   },
   { timestamps: true }
 );

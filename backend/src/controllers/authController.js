@@ -1,9 +1,12 @@
-import User from "../models/User.js";
+import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import User from "../models/User.js";
 import { upsertStreamUser } from "../lib/stream.js";
-// Utility function to generate token
-const generateToken = (userId) => {
-  return jwt.sign({ userId }, process.env.JWT_SECRET, { expiresIn: "7d" });
+
+const generateToken = (id) => {
+  return jwt.sign({ id }, process.env.JWT_SECRET, {
+    expiresIn: "30d",
+  });
 };
 
 // ----------------- SIGNUP -----------------
@@ -149,52 +152,82 @@ export const logout = async (req, res) => {
   }
 };
 
-export async function onboard(req, res) {
+// ----------------- GET ME -----------------
+export const getMe = async (req, res) => {
   try {
-    const userId = req.user._id;
+    const user = await User.findById(req.user.id).select("-password");
 
-    const { fullName, bio, location } = req.body;
-    if (!fullName || !bio || !location) {
-      return res.status(400).json({
-        message: "Please provide all required fields",
-        missingFileds: [
-          !fullName && "fullName",
-          !bio && "bio",
-          !location && "location",
-        ],
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
       });
     }
 
-    const updatedUser = await User.findByIdAndUpdate(
-      userId,
+    res.status(200).json({
+      success: true,
+      user: {
+        id: user._id,
+        fullName: user.fullName,
+        email: user.email,
+        profilePic: user.profilePic,
+        isOnboarded: user.isOnboarded,
+        bio: user.bio,
+        location: user.location,
+        friends: user.friends,
+      },
+    });
+  } catch (error) {
+    console.error("Error in getMe:", error);
+    res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+};
+
+// ----------------- ONBOARDING -----------------
+export const onboarding = async (req, res) => {
+  try {
+    const { fullName, bio, location, profilePic } = req.body;
+
+    if (!fullName || !bio || !location) {
+      return res.status(400).json({
+        success: false,
+        message: "Please fill in all required fields",
+      });
+    }
+
+    const user = await User.findByIdAndUpdate(
+      req.user.id,
       {
-        ...req.body,
+        fullName,
+        bio,
+        location,
+        profilePic,
         isOnboarded: true,
       },
       { new: true }
-    );
-    if (!updatedUser) {
-      return res.status(404).json({ message: "User not found" });
-    }
-    try {
-      await upsertStreamUser({
-        id: updatedUser._id.toString(),
-        name: updatedUser.fullName,
-        image: updatedUser.profilePic || "",
-      });
-      console.log(
-        `Stream user updated after onboarding for: ${updatedUser.fullName}`
-      );
-    } catch (streamError) {
-      console.log(
-        "Error updating user to Stream after onboarding:",
-        streamError.message
-      );
-    }
+    ).select("-password");
 
-    res.status(200).json({ success: true, user: updatedUser });
+    res.status(200).json({
+      success: true,
+      user: {
+        id: user._id,
+        fullName: user.fullName,
+        email: user.email,
+        profilePic: user.profilePic,
+        isOnboarded: user.isOnboarded,
+        bio: user.bio,
+        location: user.location,
+      },
+      message: "Profile updated successfully",
+    });
   } catch (error) {
     console.error("Error in onboarding:", error);
-    res.status(500).json({ message: "Error onboarding user", error });
+    res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
   }
-}
+};

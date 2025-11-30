@@ -60,9 +60,9 @@ const Navbar = () => {
 
       {/* Right side - User Profile */}
       <div className="flex items-center space-x-2 sm:space-x-3">
-        <button className="w-9 h-9 rounded-full bg-white/10 border border-white/10 flex items-center justify-center text-white/70 hover:text-white hover:bg-white/20 transition-colors">
+        {/* <button className="w-9 h-9 rounded-full bg-white/10 border border-white/10 flex items-center justify-center text-white/70 hover:text-white hover:bg-white/20 transition-colors">
           <FaCog className="text-base sm:text-lg" />
-        </button>
+        </button> */}
 
         <div className="relative" ref={menuRef}>
           <button
@@ -125,7 +125,7 @@ const Navbar = () => {
 
                 <button
                   onClick={handleLogout}
-                  className="w-full flex items-center space-x-3 px-4 py-2.5 hover:bg-white/10 transition-colors text-red-400 hover:text-red-300"
+                  className="w-full flex items-center cursor-pointer space-x-3 px-4 py-2.5 hover:bg-white/10 transition-colors text-red-400 hover:text-red-300"
                 >
                   <FaSignOutAlt className="text-base" />
                   <span className="text-sm font-medium">Logout</span>

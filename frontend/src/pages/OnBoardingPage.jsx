@@ -280,13 +280,14 @@ const OnBoardingPage = () => {
                   isLoading || loadingCities
                     ? "bg-white/10 text-white/60 cursor-not-allowed"
                     : "bg-white text-black hover:bg-white/90"
-                } shadow-lg`}
+                } shadow-lg flex items-center justify-center gap-2`}
             >
               {isLoading ? (
-                <div className="flex items-center justify-center gap-2">
-                  <LoadingSpinner size="sm" showText={false} />
+                <>
+                  {/* inline modern spinner */}
+                  <span className="inline-block w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                   <span>Completing Onboarding...</span>
-                </div>
+                </>
               ) : (
                 "Complete Onboarding"
               )}

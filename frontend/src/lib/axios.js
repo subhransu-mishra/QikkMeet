@@ -1,38 +1,40 @@
 import axios from "axios";
 
-// Prefer explicit env override if provided
-const envBase = import.meta.env?.VITE_BACKEND_URL;
-
-// Fixed production API endpoint (Render)
-const PROD_BASE = "https://qikmeet.onrender.com/api";
-// Local dev API endpoint - ensure /api suffix
-const DEV_BASE = "http://localhost:5001/api";
-
-// Resolve base URL: env override > production > development
-const baseURL = envBase || (import.meta.env.PROD ? PROD_BASE : DEV_BASE);
-
-console.log("[Axios] Using baseURL:", baseURL); // Debug log
+// Resolve backend base URL:
+// - Use VITE_API_BASE if provided
+// - In dev, default to http://localhost:5001/api
+// - In production, default to /api (same origin, served by backend)
+const isProd = import.meta.env.MODE === "production";
+const envBase = import.meta.env.VITE_API_BASE;
+const defaultDevBase = "http://localhost:5001/api";
+const defaultProdBase = "/api";
 
 export const axiosInstance = axios.create({
-  baseURL,
-  withCredentials: true,
-  headers: { "Content-Type": "application/json" },
-  timeout: 15000,
+  baseURL: envBase || (isProd ? defaultProdBase : defaultDevBase),
+  withCredentials: true, // send cookies if backend uses them
 });
 
-// Attach auth token
-axiosInstance.interceptors.request.use((config) => {
-  const token = localStorage.getItem("token");
-  if (token) config.headers.Authorization = `Bearer ${token}`;
-  return config;
-});
+// Attach Bearer token from localStorage
+axiosInstance.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      config.headers["Authorization"] = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
 
-// Global response handling
+// Global 401 handler
 axiosInstance.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
+    if (error.response && error.response.status === 401) {
       localStorage.removeItem("token");
+      if (window.location.pathname !== "/login") {
+        window.location.href = "/login";
+      }
     }
     return Promise.reject(error);
   }

@@ -147,13 +147,14 @@ const LoginPage = () => {
                       ? "bg-white/20 text-white cursor-not-allowed"
                       : "bg-white text-black hover:bg-white/90 hover:shadow-lg hover:shadow-white/20 cursor-pointer"
                   }
-                  shadow-lg`}
+                  shadow-lg flex items-center justify-center gap-2`}
               >
                 {isLoading ? (
-                  <div className="flex items-center justify-center gap-3">
-                    <SkewLoader color="#ffffff" size={10} />
+                  <>
+                    {/* inline modern spinner */}
+                    <span className="inline-block w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                     <span className="text-white">Signing In...</span>
-                  </div>
+                  </>
                 ) : (
                   "Sign In"
                 )}

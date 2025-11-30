@@ -11,6 +11,16 @@ import chatRoutes from "./routes/chatRoute.js";
 import callRoutes from "./routes/callRoute.js";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import fraudDetectionRoutes from "./routes/fraudDetection.routes.js";
+import webhookRoutes from "./routes/webhook.routes.js";
+import "./workers/moderation.worker.js";
+import {
+  getRecommendedUsers,
+  getMyFriends,
+  getOutgoingFriendRequests,
+  sendFriendRequest,
+} from "./controllers/userController.js";
+import { protectRoute } from "./middlewares/authMiddleware.js";
 
 const PORT = process.env.PORT || 5001;
 dotenv.config();
@@ -61,10 +71,20 @@ const authLimiter = rateLimit({
 app.use("/api/auth", authLimiter);
 
 // API Routes
-app.use("/api/auth", authRoutes); // ✅ This mounts auth routes at /api/auth
+app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/chats", chatRoutes);
-app.use("/api/calls", callRoutes); // Mount call routes for video calls
+app.use("/api/calls", callRoutes);
+app.use("/api/fraud-detection", fraudDetectionRoutes);
+app.use(
+  "/api/webhooks",
+  express.json({
+    verify: (req, res, buf) => {
+      req.rawBody = buf;
+    },
+  }),
+  webhookRoutes
+);
 
 // Favicon (avoid 404 noise)
 app.get("/favicon.ico", (_req, res) => res.status(204).end());
@@ -98,10 +118,25 @@ app.use((err, _req, res, _next) => {
     .json({ message: err.message || "Internal Server Error" });
 });
 
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-  connectDB();
-});
+const startServer = async () => {
+  try {
+    const dbStatus = await connectDB();
+    if (!dbStatus?.connected) {
+      console.warn(
+        "⚠️ DB not connected. API will run with limited functionality."
+      );
+    }
+
+    app.listen(PORT, () => {
+      console.log(`🚀 Server is running on port ${PORT}`);
+    });
+  } catch (error) {
+    console.error("💀 Failed to start server:", error.message);
+    // Do NOT exit here due to transient DNS errors; keep nodemon running
+  }
+};
+
+startServer();
 
 // Process-level error guards
 process.on("unhandledRejection", (reason) => {
@@ -110,3 +145,13 @@ process.on("unhandledRejection", (reason) => {
 process.on("uncaughtException", (err) => {
   console.error("Uncaught Exception:", err);
 });
+
+// Fix 404: Ensure required user endpoints exist (temporary direct wiring)
+app.get("/api/users", protectRoute, getRecommendedUsers);
+app.get("/api/users/friends", protectRoute, getMyFriends);
+app.get(
+  "/api/users/outgoing-friend-requests",
+  protectRoute,
+  getOutgoingFriendRequests
+);
+app.post("/api/users/friend-request/:id", protectRoute, sendFriendRequest);

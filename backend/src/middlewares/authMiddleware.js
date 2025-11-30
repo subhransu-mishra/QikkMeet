@@ -1,53 +1,74 @@
 import jwt from "jsonwebtoken";
 import User from "../models/User.js";
+import mongoose from "mongoose";
 
 export const protectRoute = async (req, res, next) => {
   try {
-    // Get token from header
-    const authHeader = req.headers.authorization;
-    if (!authHeader?.startsWith("Bearer ")) {
-      return res.status(401).json({ message: "Not authorized, no token" });
+    // Check if database is connected
+    if (mongoose.connection.readyState !== 1) {
+      return res.status(503).json({
+        success: false,
+        message: "Service temporarily unavailable. Please try again later.",
+      });
     }
 
-    const token = authHeader.split(" ")[1];
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    let token;
 
-    const user = await User.findById(decoded.userId).select("-password");
-    if (!user) {
-      return res
-        .status(401)
-        .json({ message: "Not authorized, user not found" });
-    }
-
-    req.user = user;
-    next();
-  } catch (error) {
-    console.log("Auth middleware error:", error);
-
-    // Check if error is JWT related
-    if (error.name === "TokenExpiredError") {
-      return res
-        .status(401)
-        .json({ message: "Token expired, please login again" });
-    }
-
-    if (error.name === "JsonWebTokenError") {
-      return res.status(401).json({ message: "Invalid token" });
-    }
-
-    // Check if it's a MongoDB connection error
+    // Check for token in Authorization header (Bearer token)
     if (
-      error.name === "MongoServerSelectionError" ||
-      error.name === "MongoNetworkError"
+      req.headers.authorization &&
+      req.headers.authorization.startsWith("Bearer")
     ) {
-      return res
-        .status(503)
-        .json({
-          message:
-            "Database connection failed. Please check your MongoDB connection.",
-        });
+      token = req.headers.authorization.split(" ")[1];
+    }
+    // Fallback to cookies
+    else if (req.cookies.token) {
+      token = req.cookies.token;
     }
 
-    res.status(401).json({ message: "Not authorized, token failed" });
+    if (!token) {
+      return res.status(401).json({
+        success: false,
+        message: "Not authorized, no token",
+      });
+    }
+
+    try {
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+      const user = await User.findById(decoded.id).select("-password");
+
+      if (!user) {
+        return res.status(401).json({
+          success: false,
+          message: "Not authorized, user not found",
+        });
+      }
+
+      req.user = user;
+      next();
+    } catch (jwtError) {
+      return res.status(401).json({
+        success: false,
+        message: "Not authorized, token failed",
+      });
+    }
+  } catch (error) {
+    console.error("Auth middleware error:", error);
+
+    if (
+      error.name === "MongooseError" ||
+      error.message.includes("buffering timed out")
+    ) {
+      return res.status(503).json({
+        success: false,
+        message: "Database connection issue. Please try again later.",
+      });
+    }
+
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
   }
 };
