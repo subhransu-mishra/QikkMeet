@@ -92,7 +92,7 @@ Before you begin, ensure you have the following installed:
 ### 1. Clone the Repository
 
 ```bash
-git clone <repository-url>
+git clone "https://github.com/subhransu-mishra/QikkMeet"
 cd Video+Chat
 ```
 
@@ -385,15 +385,8 @@ Contributions are welcome! Please follow these steps:
 - Write meaningful commit messages
 - Add comments for complex logic
 
-## 📝 License
 
-This project is licensed under the ISC License.
 
-## 🙏 Acknowledgments
-
-- [Stream.io](https://getstream.io) for providing excellent SDKs
-- [React](https://react.dev) team for the amazing framework
-- [Tailwind CSS](https://tailwindcss.com) for the utility-first CSS framework
 
 ## 📞 Support
 
