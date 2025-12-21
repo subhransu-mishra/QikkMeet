@@ -139,8 +139,8 @@ export async function rejectFriendRequest(req, res) {
         .json({ message: "You are not authorized to reject this request" });
     }
 
-    friendRequest.status = "rejected";
-    await friendRequest.save();
+    // DELETE the request instead of updating status
+    await FriendRequest.findByIdAndDelete(requestId);
 
     return res.status(200).json({ message: "Friend request rejected" });
   } catch (error) {

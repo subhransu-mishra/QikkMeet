@@ -14,13 +14,6 @@ import { fileURLToPath } from "node:url";
 import fraudDetectionRoutes from "./routes/fraudDetection.routes.js";
 import webhookRoutes from "./routes/webhook.routes.js";
 import "./workers/moderation.worker.js";
-import {
-  getRecommendedUsers,
-  getMyFriends,
-  getOutgoingFriendRequests,
-  sendFriendRequest,
-} from "./controllers/userController.js";
-import { protectRoute } from "./middlewares/authMiddleware.js";
 
 const PORT = process.env.PORT || 5001;
 dotenv.config();
@@ -72,7 +65,7 @@ app.use("/api/auth", authLimiter);
 
 // API Routes
 app.use("/api/auth", authRoutes);
-app.use("/api/users", userRoutes);
+app.use("/api/users", userRoutes); // ✅ This now handles all user endpoints
 app.use("/api/chats", chatRoutes);
 app.use("/api/calls", callRoutes);
 app.use("/api/fraud-detection", fraudDetectionRoutes);
@@ -145,13 +138,3 @@ process.on("unhandledRejection", (reason) => {
 process.on("uncaughtException", (err) => {
   console.error("Uncaught Exception:", err);
 });
-
-// Fix 404: Ensure required user endpoints exist (temporary direct wiring)
-app.get("/api/users", protectRoute, getRecommendedUsers);
-app.get("/api/users/friends", protectRoute, getMyFriends);
-app.get(
-  "/api/users/outgoing-friend-requests",
-  protectRoute,
-  getOutgoingFriendRequests
-);
-app.post("/api/users/friend-request/:id", protectRoute, sendFriendRequest);

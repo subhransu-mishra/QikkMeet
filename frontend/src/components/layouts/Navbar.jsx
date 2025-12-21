@@ -5,9 +5,11 @@ import { useAuth } from "../../hooks/useAuth";
 import { useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import { Logo } from "../ui/Logo";
+import ConfirmationModal from "../ui/ConfirmationModal";
 
 const Navbar = () => {
   const [showUserMenu, setShowUserMenu] = useState(false);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
   const { authUser } = useAuth();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -32,10 +34,15 @@ const Navbar = () => {
   }, [showUserMenu]);
 
   const handleLogout = () => {
+    setShowLogoutModal(true);
+    setShowUserMenu(false);
+  };
+
+  const confirmLogout = () => {
     localStorage.removeItem("token");
     queryClient.setQueryData(["authUser"], { user: null });
     toast.success("Logged out successfully");
-    setShowUserMenu(false);
+    setShowLogoutModal(false);
     navigate("/login");
   };
 
@@ -146,6 +153,16 @@ const Navbar = () => {
           )}
         </div>
       </div>
+
+      {/* Logout Confirmation Modal */}
+      <ConfirmationModal
+        isOpen={showLogoutModal}
+        onClose={() => setShowLogoutModal(false)}
+        onConfirm={confirmLogout}
+        title="Logout"
+        message="Are you sure you want to logout?"
+        confirmText="Logout"
+      />
     </header>
   );
 };
