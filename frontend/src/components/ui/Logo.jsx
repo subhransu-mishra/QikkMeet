@@ -3,7 +3,6 @@ import React from "react";
 export const Logo = ({ className = "" }) => {
   return (
     <div className={`inline-flex items-center gap-2.5 ${className}`}>
-      {/* Icon Circle */}
       <div className="flex-shrink-0 w-9 h-9 bg-white rounded-full flex items-center justify-center">
         <svg
           viewBox="0 0 24 24"
@@ -29,7 +28,6 @@ export const Logo = ({ className = "" }) => {
         </svg>
       </div>
 
-      {/* Text - using styled spans instead of SVG text */}
       <span
         className="font-black text-xl sm:text-2xl tracking-tight select-none"
         style={{ fontFamily: "system-ui, -apple-system, sans-serif" }}

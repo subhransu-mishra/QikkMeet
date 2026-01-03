@@ -48,14 +48,12 @@ const Navbar = () => {
 
   return (
     <header className="h-16 border-b border-white/10 bg-black px-4 sm:px-6 flex items-center justify-between">
-      {/* Left - Logo for mobile */}
       <div className="lg:hidden flex items-center">
         <Link to="/" className="flex items-center">
           <Logo className="h-6 sm:h-7 text-white" />
         </Link>
       </div>
 
-      {/* Center - Search Bar */}
       <div className="hidden md:flex items-center bg-black rounded-full px-3 py-1.5 flex-1 max-w-xl mx-4 lg:mx-10 border border-white/10">
         <FaSearch className="text-white/50 mr-2" />
         <input
@@ -65,7 +63,7 @@ const Navbar = () => {
         />
       </div>
 
-      {/* Right side - User Profile */}
+
       <div className="flex items-center space-x-2 sm:space-x-3">
         {/* <button className="w-9 h-9 rounded-full bg-white/10 border border-white/10 flex items-center justify-center text-white/70 hover:text-white hover:bg-white/20 transition-colors">
           <FaCog className="text-base sm:text-lg" />
@@ -96,10 +94,8 @@ const Navbar = () => {
             </div>
           </button>
 
-          {/* User Dropdown Menu */}
           {showUserMenu && (
             <div className="absolute right-0 top-12 w-52 bg-[#0a0a0a] rounded-xl shadow-2xl py-2 z-50 border border-white/10">
-              {/* Desktop Menu Items */}
               <div className="hidden md:block">
                 <Link
                   to="/profile"
@@ -139,7 +135,6 @@ const Navbar = () => {
                 </button>
               </div>
 
-              {/* Mobile Menu - Only Logout Button */}
               <div className="md:hidden">
                 <button
                   onClick={handleLogout}
@@ -154,7 +149,7 @@ const Navbar = () => {
         </div>
       </div>
 
-      {/* Logout Confirmation Modal */}
+
       <ConfirmationModal
         isOpen={showLogoutModal}
         onClose={() => setShowLogoutModal(false)}

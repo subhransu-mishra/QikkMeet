@@ -1,7 +1,6 @@
 import { StreamClient } from "@stream-io/node-sdk";
 import User from "../models/userModel.js";
 
-// Initialize Stream Client for generating tokens
 const streamClient = new StreamClient(
   process.env.STREAM_API_KEY,
   process.env.STREAM_API_SECRET
@@ -23,16 +22,13 @@ export const getCallToken = async (req, res) => {
       `Generating call token for user ${req.user.id} and call ${callId}`
     );
 
-    // Verify Stream credentials are available
     if (!process.env.STREAM_API_KEY || !process.env.STREAM_API_SECRET) {
       console.error("Stream API credentials missing in environment");
       return res.status(500).json({ message: "Server configuration error" });
     }
 
-    // Extract participant ID from callId (format: call-userId1-userId2)
     const participantId = callId.split("-").find((id) => id !== req.user.id);
 
-    // Fetch participant details
     let participantDetails = null;
     if (participantId) {
       try {
@@ -51,7 +47,6 @@ export const getCallToken = async (req, res) => {
       }
     }
 
-    // Generate a call-scoped token (video SDK can also use user token; here we keep call token path)
     const token = streamClient.generateCallToken({
       user_id: req.user.id,
       call_cids: [`default:${callId}`],

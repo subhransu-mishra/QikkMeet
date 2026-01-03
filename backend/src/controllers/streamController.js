@@ -16,7 +16,7 @@ export const createStreamToken = async (req, res) => {
       STREAM_API_SECRET
     );
 
-    // Create a token for the user
+    
     const token = serverClient.createToken(userId);
 
     res.status(200).json({ token });

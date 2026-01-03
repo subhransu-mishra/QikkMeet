@@ -1,79 +1,127 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useCallback } from "react";
 import { MessageInput, useChatContext } from "stream-chat-react";
 import { axiosInstance } from "../../lib/axios";
-import FraudDetectionModal from "../FraudDetectionModal"; // Re-using your existing modal
-import toast from "react-hot-toast";
+import { FraudWarningModal } from "./FraudWarningModal";
 
-/**
- * A wrapper around MessageInput that performs post-send fraud detection.
- */
 export const SafeMessageInput = (props) => {
   const { channel } = useChatContext();
-  const [detectionAlert, setDetectionAlert] = useState(null);
-  const [checkedMessageIds, setCheckedMessageIds] = useState(() => new Set());
+  const [isValidating, setIsValidating] = useState(false);
+  const [fraudWarning, setFraudWarning] = useState(null);
+  const [pendingMessageData, setPendingMessageData] = useState(null);
 
-  useEffect(() => {
-    // Guard clause: Do nothing if the channel is not ready.
-    if (!channel) {
-      console.log("SafeMessageInput: Waiting for channel...");
-      return;
-    }
-
-    console.log("SafeMessageInput: Channel is ready. Attaching listener.");
-
-    const handleNewMessage = async (event) => {
-      const message = event.message;
-      const currentUserId = channel.getClient().userID;
-
-      // 1. Only check messages sent by the current user.
-      if (message.user?.id !== currentUserId) return;
-
-      // 2. Avoid re-checking the same message.
-      if (checkedMessageIds.has(message.id)) return;
-
-      // 3. Skip empty messages.
-      if (!message.text || message.text.trim().length === 0) return;
-
-      console.log(`[POST-SEND CHECK] Checking: "${message.text}"`);
-      setCheckedMessageIds((prev) => new Set(prev).add(message.id));
-
-      try {
-        const response = await axiosInstance.post(
-          "/api/fraud-detection/validate-message",
-          { message: message.text }
-        );
-
-        if (response.data.isSuspicious) {
-          console.log(`[DETECTION] ⚠️ Misleading message detected!`);
-          setDetectionAlert({
-            message: message.text,
-            issues: response.data.issues || [],
-          });
-          toast.error("Suspicious content detected!", { icon: "⚠️" });
-        } else {
-          console.log("[DETECTION] ✅ Message is safe.");
-        }
-      } catch (error) {
-        console.error("[API ERROR]", error.response?.data || error.message);
+  const handleSend = useCallback(
+    (messageData) => {
+      // Extract text from messageData
+      const messageText = messageData?.text?.trim() || "";
+      
+      // Skip validation for empty or very short messages (send immediately)
+      if (!messageText || messageText.length < 3) {
+        // Allow short messages to pass through normally
+        return messageData;
       }
-    };
 
-    channel.on("message.new", handleNewMessage);
+      // Show loading state
+      setIsValidating(true);
 
-    // Cleanup function to remove the listener when the component unmounts or channel changes.
-    return () => {
-      channel.off("message.new", handleNewMessage);
-    };
-  }, [channel]); // Re-run this effect only when the channel object itself changes.
+      // Perform async validation
+      (async () => {
+        try {
+          console.log("[FRAUD DETECTION] Validating message:", messageText);
+          
+          // Validate message BEFORE sending
+          const response = await axiosInstance.post(
+            "/api/fraud-detection/validate-message",
+            { message: messageText },
+            { timeout: 5000 }
+          );
+
+          console.log("[FRAUD DETECTION] Validation response:", response.data);
+          setIsValidating(false);
+
+          // Check if message is suspicious
+          if (response.data?.isSuspicious) {
+            console.log("[FRAUD DETECTION] ⚠️ Suspicious content detected:", response.data.issues);
+            
+            // Store the pending message and show warning modal
+            setPendingMessageData(messageData);
+            const warningData = {
+              alert: response.data.alert || "This message contains suspicious content",
+              issues: response.data.issues || [],
+            };
+            console.log("[FRAUD DETECTION] Setting warning modal with data:", warningData);
+            setFraudWarning(warningData);
+
+            // Don't send the message - it will be blocked
+            return;
+          }
+
+          // Message is safe, send it manually
+          console.log("[FRAUD DETECTION] ✅ Message is safe, sending...");
+          if (channel) {
+            await channel.sendMessage(messageData);
+          }
+        } catch (error) {
+          console.error("[FRAUD DETECTION ERROR]", error);
+          console.error("[FRAUD DETECTION ERROR] Response:", error.response?.data);
+          console.error("[FRAUD DETECTION ERROR] Status:", error.response?.status);
+          setIsValidating(false);
+          
+          // On error, try to send the message anyway (fail-open for better UX)
+          if (channel) {
+            try {
+              await channel.sendMessage(messageData);
+            } catch (sendError) {
+              console.error("[FRAUD DETECTION] Error sending message:", sendError);
+            }
+          }
+        }
+      })();
+
+      // Return null to prevent Stream's default send behavior
+      // We handle sending manually after validation (or immediately for short messages)
+      return null;
+    },
+    [channel]
+  );
+
+  const handleConfirmSend = useCallback(async () => {
+    if (pendingMessageData && channel) {
+      try {
+        // User confirmed, send the message anyway
+        await channel.sendMessage(pendingMessageData);
+        console.log("[FRAUD DETECTION] Message sent after user confirmation");
+      } catch (err) {
+        console.error("[FRAUD DETECTION] Error sending message:", err);
+      }
+    }
+    // Clear the warning state
+    setFraudWarning(null);
+    setPendingMessageData(null);
+  }, [pendingMessageData, channel]);
+
+  const handleCancelSend = useCallback(() => {
+    // User cancelled, just clear the warning
+    setFraudWarning(null);
+    setPendingMessageData(null);
+  }, []);
 
   return (
     <>
-      <MessageInput {...props} />
-      <FraudDetectionModal
-        isOpen={!!detectionAlert}
-        onClose={() => setDetectionAlert(null)}
-        onConfirm={() => setDetectionAlert(null)} // Confirm just closes the info modal.
-        issues={detectionAlert?.issues || []}
+      <MessageInput
+        {...props}
+        overrideSubmitHandler={handleSend}
+        disabled={isValidating}
+      />
+      {isValidating && (
+        <div className="absolute bottom-20 left-1/2 transform -translate-x-1/2 bg-black/80 text-white px-4 py-2 rounded-lg text-sm">
+          Validating message...
+        </div>
+      )}
+      <FraudWarningModal
+        isOpen={!!fraudWarning}
+        onClose={handleCancelSend}
+        onConfirm={handleConfirmSend}
+        warning={fraudWarning}
       />
     </>
   );

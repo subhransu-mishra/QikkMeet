@@ -9,7 +9,7 @@ const generateToken = (id) => {
   });
 };
 
-// ----------------- SIGNUP -----------------
+
 export const signup = async (req, res) => {
   const { email, fullName, password } = req.body;
   try {
@@ -37,10 +37,10 @@ export const signup = async (req, res) => {
       return res.status(400).json({ message: "Email already exists" });
     }
 
-    // Use more reliable avatar services with fallbacks
+   
     const generateAvatar = () => {
       const randomNum = Math.floor(Math.random() * 100) + 1;
-      // Try multiple avatar services as fallbacks
+     
       const avatarServices = [
         `https://api.dicebear.com/7.x/avataaars/svg?seed=${email}`,
         `https://ui-avatars.com/api/?name=${encodeURIComponent(
@@ -51,12 +51,12 @@ export const signup = async (req, res) => {
           email
         )}`,
       ];
-      return avatarServices[0]; // Use first one as primary
+      return avatarServices[0]; 
     };
 
     const randomAvatar = generateAvatar();
 
-    // Create new user
+   
     const newUser = new User({
       email,
       fullName,
@@ -75,9 +75,9 @@ export const signup = async (req, res) => {
       console.log("Error creating user to Stream:", error);
     }
 
-    // Generate token
+    
     const token = generateToken(newUser._id);
-    // Send token in response
+    
     res.status(201).json({
       message: "User created successfully",
       token,
@@ -97,7 +97,7 @@ export const signup = async (req, res) => {
   }
 };
 
-// ----------------- LOGIN -----------------
+
 export const login = async (req, res) => {
   const { email, password } = req.body;
 
@@ -140,11 +140,10 @@ export const login = async (req, res) => {
   }
 };
 
-// ----------------- LOGOUT -----------------
+
 export const logout = async (req, res) => {
   try {
-    // With JWT, no need to clear cookies
-    // Client should remove the token from storage
+    
     res.status(200).json({ message: "User logged out successfully" });
   } catch (error) {
     console.error("Error in logout:", error);
@@ -152,7 +151,7 @@ export const logout = async (req, res) => {
   }
 };
 
-// ----------------- GET ME -----------------
+
 export const getMe = async (req, res) => {
   try {
     const user = await User.findById(req.user.id).select("-password");
@@ -186,7 +185,7 @@ export const getMe = async (req, res) => {
   }
 };
 
-// ----------------- ONBOARDING -----------------
+
 export const onboarding = async (req, res) => {
   try {
     const { fullName, bio, location, profilePic } = req.body;

@@ -7,7 +7,7 @@ export const useAuth = () => {
     queryFn: async () => {
       try {
         const res = await axiosInstance.get("/auth/me");
-        return res.data; // { user: { ... } }
+        return res.data;
       } catch (error) {
         if (error.response?.status === 401) {
           return { user: null };
@@ -17,8 +17,8 @@ export const useAuth = () => {
     },
     refetchOnWindowFocus: false,
     retry: false,
-    staleTime: 1000 * 60 * 10, // 10 minutes
-    cacheTime: 1000 * 60 * 30, // 30 minutes
+    staleTime: 1000 * 60 * 10, 
+    cacheTime: 1000 * 60 * 30,
   });
 
   return {

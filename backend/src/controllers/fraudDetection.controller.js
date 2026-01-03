@@ -4,7 +4,7 @@ export const validateMessage = async (req, res) => {
   try {
     const { message } = req.body;
 
-    // Fast validation checks
+    
     if (!message || typeof message !== "string") {
       return res.status(400).json({
         success: false,
@@ -20,7 +20,7 @@ export const validateMessage = async (req, res) => {
       });
     }
 
-    // Quick length check - if message is too short, likely safe
+
     if (trimmed.length < 3) {
       return res.status(200).json({
         success: true,
@@ -29,7 +29,7 @@ export const validateMessage = async (req, res) => {
       });
     }
 
-    // Perform fraud detection
+    
     const validationResult = fraudDetectionService.checkMessage(trimmed);
 
     if (validationResult.isSuspicious) {
@@ -49,7 +49,7 @@ export const validateMessage = async (req, res) => {
     });
   } catch (error) {
     console.error("Error in fraud detection:", error);
-    // If auth middleware passes but user context missing, return 401 for clarity
+    
     if (error.name === "UnauthorizedError") {
       return res.status(401).json({ success: false, error: "Unauthorized" });
     }

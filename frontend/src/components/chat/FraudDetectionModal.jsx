@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { FraudWarningModal } from "./FraudWarningModal";
 
-/**
- * Modal component that listens for fraud detection warnings
- */
+
 export const FraudDetectionModal = ({ channel }) => {
   const [fraudWarning, setFraudWarning] = useState(null);
   const [pendingMessage, setPendingMessage] = useState(null);

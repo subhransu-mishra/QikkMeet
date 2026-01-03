@@ -8,9 +8,9 @@ export async function getRecommendedUsers(req, res) {
 
     const candidates = await User.find({
       $and: [
-        { _id: { $ne: currentUserId } }, // Exclude current user
-        { _id: { $nin: currentUser.friends } }, // Exclude current user's friends
-        { isOnboarded: true }, // Only include onboarded users
+        { _id: { $ne: currentUserId } },
+        { _id: { $nin: currentUser.friends } },
+        { isOnboarded: true },
       ],
     }).select("fullName profilePic location bio");
 
@@ -47,7 +47,7 @@ export async function sendFriendRequest(req, res) {
     const myId = req.user.id;
     const { id: recipientId } = req.params;
 
-    //prevnt sending request to oneself
+    
     if (myId === recipientId) {
       return res
         .status(400)

@@ -8,7 +8,8 @@ export const FraudWarningModal = ({
   onConfirm,
   warning,
 }) => {
-  if (!warning) return null;
+  // Don't render if not open or no warning data
+  if (!isOpen || !warning) return null;
 
   const getSeverityColor = (severity) => {
     switch (severity) {
@@ -49,7 +50,7 @@ export const FraudWarningModal = ({
             onClick={(e) => e.stopPropagation()}
             className="bg-black rounded-2xl p-6 max-w-md w-full relative shadow-2xl border border-orange-500/30"
           >
-            {/* Close button */}
+            
             <button
               onClick={onClose}
               className="absolute top-4 right-4 text-white/60 hover:text-white transition"
@@ -57,14 +58,14 @@ export const FraudWarningModal = ({
               <FaTimes size={20} />
             </button>
 
-            {/* Warning Icon */}
+            
             <div className="flex justify-center mb-4">
               <div className="w-16 h-16 rounded-full bg-orange-500/20 flex items-center justify-center">
                 <FaExclamationTriangle className="text-3xl text-orange-400" />
               </div>
             </div>
 
-            {/* Title */}
+           
             <h2 className="text-2xl font-bold text-center mb-2 text-white">
               Suspicious Content Detected
             </h2>
@@ -73,7 +74,7 @@ export const FraudWarningModal = ({
                 "This message may contain misleading or suspicious content."}
             </p>
 
-            {/* Detected Issues */}
+            
             {warning.issues && warning.issues.length > 0 && (
               <div className="bg-black/50 rounded-lg p-4 mb-6 border border-white/10">
                 <div className="flex items-center gap-2 mb-3">
@@ -121,7 +122,7 @@ export const FraudWarningModal = ({
               </div>
             )}
 
-            {/* Warning Message */}
+           
             <div className="bg-orange-500/10 border border-orange-500/30 rounded-lg p-3 mb-6">
               <p className="text-sm text-orange-200 text-center">
                 ⚠️ Please review your message carefully. Sending suspicious
@@ -129,7 +130,7 @@ export const FraudWarningModal = ({
               </p>
             </div>
 
-            {/* Buttons */}
+            
             <div className="space-y-3">
               <button
                 onClick={onClose}

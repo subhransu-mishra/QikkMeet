@@ -12,7 +12,7 @@ import {
   MessageInput,
   LoadingIndicator,
 } from "stream-chat-react";
-import FraudDetectionModal from "../components/FraudDetectionModal";
+import { SafeMessageInput } from "../components/chat/SafeMessageInput";
 import { FaVideo, FaCopy, FaTimes } from "react-icons/fa";
 import "stream-chat-react/dist/css/v2/index.css";
 import toast from "react-hot-toast";
@@ -28,12 +28,6 @@ const ChatPage = () => {
   const [channel, setChannel] = useState(null);
   const [showCallModal, setShowCallModal] = useState(false);
   const [callLink, setCallLink] = useState("");
-
-  // Suspicious message modal state (post-send detection)
-  const [showFraudModal, setShowFraudModal] = useState(false);
-  const [detectedIssues, setDetectedIssues] = useState([]);
-  const [suspiciousText, setSuspiciousText] = useState("");
-  const [checkedIds, setCheckedIds] = useState(() => new Set());
 
   // Fetch the Stream token for the authenticated user
   const { data: streamTokenData, isLoading: tokenLoading } = useQuery({
@@ -117,76 +111,6 @@ const ChatPage = () => {
     };
   }, [chatClient, chatWithUserId, authUser, navigate]);
 
-  // Post-send detection: listen for messages sent by the current user
-  useEffect(() => {
-    if (!channel || !authUser?.id) return;
-
-    const handleCheck = async (msg) => {
-      const senderId = msg?.user?.id;
-      const text = msg?.text?.trim() || "";
-
-      // Only check current user's messages with non-empty text
-      if (!text || senderId !== authUser.id) return;
-
-      // Avoid duplicate checks
-      if (checkedIds.has(msg.id)) return;
-      setCheckedIds((prev) => new Set(prev).add(msg.id));
-
-      try {
-        // Use absolute API path to avoid 404 if axios baseURL isn't set
-        const res = await axiosInstance.post(
-          "/api/fraud-detection/validate-message",
-          { message: text },
-          { timeout: 3000 }
-        );
-
-        if (!res || res.status !== 200) {
-          console.warn("Detection API non-200:", res?.status);
-          return;
-        }
-
-        if (res.data?.isSuspicious) {
-          console.warn("Misleading message detected:", text);
-          setDetectedIssues(res.data.issues || []);
-          setSuspiciousText(text);
-          setShowFraudModal(true);
-        }
-      } catch (err) {
-        const status = err?.response?.status;
-        const data = err?.response?.data;
-        if (status === 404) {
-          console.error(
-            "Detection endpoint not found (404). Check server route '/api/fraud-detection/validate-message'.",
-            data
-          );
-        } else if (status === 401 || status === 503) {
-          console.error(
-            "Detection unauthorized or service unavailable:",
-            status,
-            data
-          );
-        } else {
-          console.error(
-            "Post-send detection error:",
-            status,
-            data || err.message
-          );
-        }
-        // fail-open: keep chat UX smooth
-      }
-    };
-
-    const onNew = (event) => handleCheck(event?.message);
-    const onUpdated = (event) => handleCheck(event?.message);
-
-    channel.on("message.new", onNew);
-    channel.on("message.updated", onUpdated);
-
-    return () => {
-      channel.off("message.new", onNew);
-      channel.off("message.updated", onUpdated);
-    };
-  }, [channel, authUser?.id, checkedIds]);
 
   if (authLoading || tokenLoading) {
     return <LoadingIndicator />;
@@ -271,28 +195,11 @@ const ChatPage = () => {
             </div>
 
             <MessageList />
-            {/* Use default MessageInput. Detection is handled post-send via channel events. */}
-            <MessageInput />
+            {/* Use SafeMessageInput for pre-send fraud detection */}
+            <SafeMessageInput />
           </Window>
         </Channel>
       </Chat>
-
-      {/* Post-send detection modal */}
-      <FraudDetectionModal
-        isOpen={showFraudModal}
-        onClose={() => {
-          setShowFraudModal(false);
-          setDetectedIssues([]);
-          setSuspiciousText("");
-        }}
-        // For post-send info modal, confirm just closes
-        onConfirm={() => {
-          setShowFraudModal(false);
-          setDetectedIssues([]);
-          setSuspiciousText("");
-        }}
-        issues={detectedIssues}
-      />
 
       {/* Call Link Modal */}
       <AnimatePresence>

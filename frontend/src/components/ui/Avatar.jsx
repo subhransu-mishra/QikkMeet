@@ -4,7 +4,6 @@ const Avatar = ({ src, alt, className = "", fallbackText }) => {
   const [imgError, setImgError] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Fallback avatar if image fails to load
   const fallbackAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(
     alt || fallbackText || "User"
   )}&background=random&size=200`;

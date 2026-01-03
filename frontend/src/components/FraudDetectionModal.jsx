@@ -44,7 +44,7 @@ const FraudDetectionModal = ({ isOpen, onClose, onConfirm, issues = [] }) => {
             onClick={(e) => e.stopPropagation()}
             className="bg-[#0a0a0a] rounded-2xl p-6 max-w-lg w-full relative shadow-2xl border border-red-500/20"
           >
-            {/* Close button */}
+            
             <button
               onClick={onClose}
               className="absolute top-4 right-4 text-white/60 hover:text-white transition"
@@ -52,14 +52,14 @@ const FraudDetectionModal = ({ isOpen, onClose, onConfirm, issues = [] }) => {
               <FaTimes size={20} />
             </button>
 
-            {/* Warning Icon */}
+            
             <div className="flex justify-center mb-4">
               <div className="w-16 h-16 rounded-full bg-red-500/20 flex items-center justify-center">
                 <FaExclamationTriangle className="text-3xl text-red-500" />
               </div>
             </div>
 
-            {/* Title */}
+            
             <h2 className="text-2xl font-bold text-center mb-2 text-white">
               Suspicious Content Detected
             </h2>
@@ -67,7 +67,7 @@ const FraudDetectionModal = ({ isOpen, onClose, onConfirm, issues = [] }) => {
               Your message contains potentially harmful or suspicious content
             </p>
 
-            {/* Issues List */}
+          
             <div className="space-y-3 mb-6 max-h-60 overflow-y-auto">
               {issues.map((issue, index) => (
                 <div
@@ -108,7 +108,7 @@ const FraudDetectionModal = ({ isOpen, onClose, onConfirm, issues = [] }) => {
               ))}
             </div>
 
-            {/* Warning Text */}
+            
             <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-lg p-4 mb-6">
               <p className="text-yellow-500 text-sm text-center">
                 ⚠️ Sending suspicious messages may violate our terms of service
@@ -116,7 +116,7 @@ const FraudDetectionModal = ({ isOpen, onClose, onConfirm, issues = [] }) => {
               </p>
             </div>
 
-            {/* Buttons */}
+           
             <div className="space-y-3">
               <button
                 onClick={onClose}

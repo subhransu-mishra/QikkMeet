@@ -3,17 +3,13 @@ import { MessageInput, useMessageInputContext } from "stream-chat-react";
 import { axiosInstance } from "../../lib/axios";
 import { FraudWarningModal } from "./FraudWarningModal";
 
-/**
- * Custom MessageInput wrapper with fraud detection
- * This component must be used within MessageInputProvider context
- */
+
 export const FraudDetectionMessageInput = (props) => {
-  // Try to use the context - if it fails, we'll handle it gracefully
   let contextData = null;
   try {
     contextData = useMessageInputContext();
   } catch (error) {
-    // Context not available, fall back to basic MessageInput
+    
     console.warn("MessageInputContext not available, using basic MessageInput");
     return <MessageInput {...props} />;
   }
@@ -25,7 +21,6 @@ export const FraudDetectionMessageInput = (props) => {
   const [fraudWarning, setFraudWarning] = useState(null);
   const [pendingMessage, setPendingMessage] = useState(null);
 
-  // Validate message with fraud detection API
   const validateMessage = useCallback(async (messageText) => {
     if (!messageText || !messageText.trim()) {
       return { isSafe: true };
@@ -55,31 +50,26 @@ export const FraudDetectionMessageInput = (props) => {
       return { isSafe: true };
     } catch (error) {
       console.error("Fraud detection error:", error);
-      // On error, allow message to send (fail open for better UX)
       return { isSafe: true, error: true };
     } finally {
       setIsValidating(false);
     }
   }, []);
 
-  // Intercept the send
   const handleSend = useCallback(
     async (e) => {
       e?.preventDefault?.();
 
       const messageText = text?.trim() || "";
 
-      // Skip validation for empty messages or attachments only
       if (!messageText && (!attachments || attachments.length === 0)) {
         handleSubmit(e);
         return;
       }
 
-      // Validate message
       const validation = await validateMessage(messageText);
 
       if (!validation.isSafe) {
-        // Store the pending message and show warning
         const messageData = {
           text: messageText,
           attachments,
@@ -91,20 +81,20 @@ export const FraudDetectionMessageInput = (props) => {
           issues: validation.issues || [],
           alert: validation.alert || "This message contains suspicious content",
         });
-        return; // Prevent sending
+        return; 
       }
 
-      // Message is safe, proceed with normal send
+      
       handleSubmit(e);
     },
     [text, attachments, mentioned_users, parent, handleSubmit, validateMessage]
   );
 
-  // Handle user confirming to send despite warning
+  
   const handleConfirmSend = useCallback(async () => {
     if (pendingMessage && channel) {
       try {
-        // Send the message directly via channel
+        
         await channel.sendMessage(pendingMessage);
       } catch (err) {
         console.error("Error sending message:", err);
@@ -114,7 +104,7 @@ export const FraudDetectionMessageInput = (props) => {
     setPendingMessage(null);
   }, [channel, pendingMessage]);
 
-  // Handle user canceling
+ 
   const handleCancelSend = useCallback(() => {
     setFraudWarning(null);
     setPendingMessage(null);

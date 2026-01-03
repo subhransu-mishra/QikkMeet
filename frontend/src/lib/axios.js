@@ -11,10 +11,10 @@ const defaultProdBase = "/api";
 
 export const axiosInstance = axios.create({
   baseURL: envBase || (isProd ? defaultProdBase : defaultDevBase),
-  withCredentials: true, // send cookies if backend uses them
+  withCredentials: true, 
 });
 
-// Attach Bearer token from localStorage
+
 axiosInstance.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("token");
@@ -26,7 +26,7 @@ axiosInstance.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Global 401 handler
+
 axiosInstance.interceptors.response.use(
   (response) => response,
   (error) => {
