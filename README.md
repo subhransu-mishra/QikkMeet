@@ -369,6 +369,16 @@ Enable verbose logging by setting:
 NODE_ENV=development
 ```
 
+<img width="1919" height="1079" alt="Screenshot 2025-11-30 213819" src="https://github.com/user-attachments/assets/17c11182-c46a-4049-82ec-60c9de73f7e8" />
+<img width="1913" height="866" alt="Screenshot 2025-11-30 213749" src="https://github.com/user-attachments/assets/eeba2a5a-48fd-4bca-abaa-ca161d9446c9" />
+<img width="1919" height="904" alt="Screenshot 2025-11-30 122204" src="https://github.com/user-attachments/assets/d3c8aadb-1276-4b35-b1f4-c67904317a1b" />
+<img width="1919" height="899" alt="Screenshot 2025-11-30 121719" src="https://github.com/user-attachments/assets/f37adebe-fee5-4f4f-a96b-2582ddbdd22d" />
+<img width="1919" height="894" alt="Screenshot 2025-11-30 121702" src="https://github.com/user-attachments/assets/3ec6976a-c9f9-49e0-8e13-422a82c65301" />
+<img width="1919" height="909" alt="Screenshot 2025-11-30 121546" src="https://github.com/user-attachments/assets/e0f72980-2787-4105-af47-15c1504ce410" />
+<img width="1919" height="871" alt="Screenshot 2025-11-30 213939" src="https://github.com/user-attachments/assets/4bb41fcd-04a1-411f-a7a7-99c1b779dd49" />
+<img width="1892" height="869" alt="Screenshot 2025-11-30 213921" src="https://github.com/user-attachments/assets/08267ea5-9b27-4704-ad42-11c49df9b333" />
+
+
 ## 🤝 Contributing
 
 Contributions are welcome! Please follow these steps:
@@ -389,6 +399,8 @@ Contributions are welcome! Please follow these steps:
 
 
 ## 📞 Support
+
+
 
 For issues, questions, or contributions, please open an issue on the repository.
 
