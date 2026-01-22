@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { axiosInstance } from "../lib/axios";
 import { LoadingSpinner } from "../components/ui/LoadingSpinner";
@@ -14,11 +14,35 @@ import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useAuth } from "../hooks/useAuth"; // [ADD] import
 import { Avatar } from "../components/ui/Avatar";
+// Inline pop-up modals coded directly in HomePage (no separate UI files)
 
 const HomePage = () => {
   const queryClient = useQueryClient();
   const [pendingConnectId, setPendingConnectId] = useState(null);
+  const [showBetaModal, setShowBetaModal] = useState(false);
+  const [showCookieConsent, setShowCookieConsent] = useState(false);
   const { authUser } = useAuth(); // [ADD] get current user
+
+  // Show beta notice and cookie consent on first visit after auth
+  useEffect(() => {
+    // Beta notice
+    const betaAck = localStorage.getItem("betaNoticeAcknowledged");
+    if (!betaAck) setShowBetaModal(true);
+
+    // Cookie consent
+    const cookieAck = localStorage.getItem("cookieConsentAccepted");
+    if (!cookieAck) setShowCookieConsent(true);
+  }, []);
+
+  const handleBetaOkay = () => {
+    localStorage.setItem("betaNoticeAcknowledged", "true");
+    setShowBetaModal(false);
+  };
+
+  const handleAcceptCookies = () => {
+    localStorage.setItem("cookieConsentAccepted", "true");
+    setShowCookieConsent(false);
+  };
 
   // Fetch friends
   const {
@@ -58,7 +82,7 @@ const HomePage = () => {
   const outgoingRecipientIds = new Set(
     Array.isArray(outgoingData)
       ? outgoingData.map((req) => req.recipient?._id || req.recipient)
-      : []
+      : [],
   );
   const friends = Array.isArray(friendsData) ? friendsData : [];
   const friendIds = new Set(friends.map((f) => f._id));
@@ -276,6 +300,91 @@ const HomePage = () => {
           </div>
         )}
       </motion.section>
+      {/* Inline Global Modals */}
+      {showBetaModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          {/* Transparent blur backdrop */}
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-xl" />
+          {/* Dialog */}
+          <div className="relative z-10 w-full max-w-md mx-4">
+            <div className="bg-black/60 border border-white/10 rounded-3xl shadow-xl p-8 text-white">
+              <div className="flex flex-col items-center text-center">
+                <div className="inline-flex items-center justify-center w-14 h-14 bg-white/10 rounded-xl mb-4">
+                  <svg
+                    className="w-7 h-7"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M13 16h-1v-4h-1m1-4h.01M21 12c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9 9 4.03 9 9z"
+                    />
+                  </svg>
+                </div>
+                <h3 className="text-2xl font-bold mb-2">Beta Version</h3>
+                <p className="text-white/80 text-sm leading-relaxed">
+                  This is a beta release. Many features and pages are still
+                  under development. You may encounter changes or occasional
+                  issues.
+                </p>
+                <button
+                  onClick={handleBetaOkay}
+                  className="mt-6 w-full py-3 rounded-xl bg-white text-black font-semibold hover:bg-white/90 transition-colors cursor-pointer"
+                >
+                  Okay
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showCookieConsent && (
+        <div className="fixed z-[60] bottom-4 inset-x-4 sm:inset-auto sm:right-6 sm:bottom-6 w-[calc(100vw-2rem)] sm:w-auto max-w-sm">
+          <div className="bg-black/60 border border-white/10 rounded-2xl shadow-xl p-3 sm:p-4 backdrop-blur-xl text-white">
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 flex items-center justify-center bg-white/10 rounded-lg shrink-0">
+                <svg
+                  className="w-6 h-6"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 3c.132 0 .263.006.392.017a4.001 4.001 0 004.591 4.591A9.003 9.003 0 013 12c0 4.97 4.03 9 9 9 4.63 0 8.44-3.5 8.94-8.005A3.5 3.5 0 0116.5 9.5a3.5 3.5 0 01-3.5-3.5C13 4.343 12.657 3 12 3z"
+                  />
+                </svg>
+              </div>
+              <div className="flex-1">
+                <p className="text-xs sm:text-sm text-white/90">
+                  We use cookies to improve your experience. By continuing, you
+                  agree to our use of cookies.
+                </p>
+                <div className="mt-3 flex items-center gap-3 flex-wrap">
+                  <button
+                    onClick={handleAcceptCookies}
+                    className="px-4 py-2 rounded-lg bg-white text-black text-sm font-semibold hover:bg-white/90 transition-colors cursor-pointer w-full sm:w-auto"
+                  >
+                    Accept
+                  </button>
+                  <a
+                    href="#"
+                    className="text-xs sm:text-sm text-white/70 hover:text-white w-full sm:w-auto text-center sm:text-left"
+                  >
+                    Learn more
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

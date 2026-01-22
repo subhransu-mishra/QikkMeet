@@ -86,7 +86,7 @@ const Navbar = () => {
                   "https://api.dicebear.com/7.x/avataaars/svg?seed=default"
                 }
                 alt="User Profile"
-                className="w-8 h-8 sm:w-10 sm:h-10 rounded-full object-cover border-2 border-white"
+                className="w-8 h-8 cursor-pointer sm:w-10 sm:h-10 rounded-full object-cover border-2 border-white"
               />
               <span className="absolute -bottom-10 left-1/2 transform -translate-x-1/2 bg-black px-3 py-1 rounded-lg text-xs whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300 border border-white/10 shadow-lg pointer-events-none z-50 hidden md:block">
                 {user?.fullName || "User"}
@@ -100,7 +100,7 @@ const Navbar = () => {
                 <Link
                   to="/profile"
                   onClick={() => setShowUserMenu(false)}
-                  className="flex items-center space-x-3 px-4 py-2.5 hover:bg-white/10 transition-colors text-white"
+                  className="flex items-center cursor-pointer space-x-3 px-4 py-2.5 hover:bg-white/10 transition-colors text-white"
                 >
                   <img
                     src={
@@ -108,7 +108,7 @@ const Navbar = () => {
                       "https://api.dicebear.com/7.x/avataaars/svg?seed=default"
                     }
                     alt="User Profile"
-                    className="w-8 h-8 rounded-full object-cover"
+                    className="w-8 h-8 rounded-full cursor-pointer object-cover"
                   />
                   <span className="text-sm font-medium">My Profile</span>
                 </Link>

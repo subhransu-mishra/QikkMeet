@@ -108,14 +108,12 @@ const SignUpPage = () => {
               {/* Header */}
               <div className="text-center mb-8">
                 <div className="inline-flex items-center justify-center w-14 h-14 bg-gradient-to-br from-white/10 to-white/5 rounded-xl mb-4 backdrop-blur-sm">
-                  <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
-                  </svg>
+                  <img src="/logo2.png" alt="Logo" className="w-full" />
                 </div>
                 <h2 className="text-3xl lg:text-4xl font-bold text-white mb-2 tracking-tight">
                   Create Account
                 </h2>
-                <p className="text-gray-400 text-sm">Join us for an amazing experience</p>
+                <p className="text-gray-400 text-sm">Just few steps away</p>
               </div>
 
               {/* Form */}
@@ -202,7 +200,9 @@ const SignUpPage = () => {
                     />
                     <button
                       type="button"
-                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      onClick={() =>
+                        setShowConfirmPassword(!showConfirmPassword)
+                      }
                       className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white transition-colors duration-200"
                     >
                       {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
@@ -282,19 +282,19 @@ const SignUpPage = () => {
                 </button>
               </form>
 
-            {/* Footer */}
-            <div className="mt-6 text-center">
-              <p className="text-gray-400 text-sm">
-                Already have an account?{" "}
-                <Link
-                  to="/login"
-                  className="text-white cursor-pointer hover:underline font-medium transition-colors duration-200"
-                >
-                  Sign in
-                </Link>
-              </p>
+              {/* Footer */}
+              <div className="mt-6 text-center">
+                <p className="text-gray-400 text-sm">
+                  Already have an account?{" "}
+                  <Link
+                    to="/login"
+                    className="text-white cursor-pointer hover:underline font-medium transition-colors duration-200"
+                  >
+                    Sign in
+                  </Link>
+                </p>
+              </div>
             </div>
-          </div>
           </div>
           {/* Divider - Vertical on desktop, horizontal on mobile */}
           <div className="hidden lg:block w-px h-96 bg-gradient-to-b from-transparent via-white/20 to-transparent"></div>
@@ -307,28 +307,36 @@ const SignUpPage = () => {
           {/* Right Side - Social Login Section */}
           <div className="w-full lg:w-1/2 max-w-md">
             <div className="bg-black/40 backdrop-blur-xl border border-white/10 rounded-3xl shadow-2xl p-8 lg:p-10">
-              <h3 className="text-2xl font-semibold text-white mb-6 text-center">Sign up with</h3>
+              <h3 className="text-2xl font-semibold text-white mb-6 text-center">
+                Sign up with
+              </h3>
               <div className="space-y-4">
                 <button
                   type="button"
                   className="w-full flex items-center justify-center gap-3 py-3.5 px-6 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 rounded-xl transition-all duration-300 cursor-pointer group"
                 >
                   <FcGoogle className="w-6 h-6" />
-                  <span className="text-white font-medium group-hover:text-white/90">Continue with Google</span>
+                  <span className="text-white font-medium group-hover:text-white/90">
+                    Continue with Google
+                  </span>
                 </button>
                 <button
                   type="button"
                   className="w-full flex items-center justify-center gap-3 py-3.5 px-6 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 rounded-xl transition-all duration-300 cursor-pointer group"
                 >
                   <FaFacebook className="w-6 h-6 text-[#1877F2]" />
-                  <span className="text-white font-medium group-hover:text-white/90">Continue with Facebook</span>
+                  <span className="text-white font-medium group-hover:text-white/90">
+                    Continue with Facebook
+                  </span>
                 </button>
                 <button
                   type="button"
                   className="w-full flex items-center justify-center gap-3 py-3.5 px-6 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 rounded-xl transition-all duration-300 cursor-pointer group"
                 >
                   <FaApple className="w-6 h-6 text-white" />
-                  <span className="text-white font-medium group-hover:text-white/90">Continue with Apple</span>
+                  <span className="text-white font-medium group-hover:text-white/90">
+                    Continue with Apple
+                  </span>
                 </button>
               </div>
             </div>
