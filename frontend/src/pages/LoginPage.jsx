@@ -26,14 +26,15 @@ const LoginPage = () => {
       });
       return response.data;
     },
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       toast.success("Login successful!");
       localStorage.setItem("token", data.token);
 
-      // Update the auth query cache with the user data
+      // Clear all cached queries to avoid showing previous user's data
+      await queryClient.cancelQueries();
+      queryClient.clear();
+      // Seed fresh auth user
       queryClient.setQueryData(["authUser"], { user: data.user });
-
-      // Navigate to home page
       navigate("/");
     },
     onError: (error) => {
@@ -89,8 +90,6 @@ const LoginPage = () => {
               <div className="text-center mb-8">
                 <div className="inline-flex items-center justify-center w-14 h-14 bg-gradient-to-br from-white/10 to-white/5 rounded-xl mb-4 backdrop-blur-sm">
                   <img src="/logo2.png" alt="Logo" className="w-full" />
-
-              
                 </div>
                 <h2 className="text-3xl lg:text-4xl font-bold text-white mb-2 tracking-tight">
                   Sign in

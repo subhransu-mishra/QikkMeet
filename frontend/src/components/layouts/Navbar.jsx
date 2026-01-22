@@ -6,6 +6,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import { Logo } from "../ui/Logo";
 import ConfirmationModal from "../ui/ConfirmationModal";
+import { disconnectStreamUser } from "../../lib/streamChat";
 
 const Navbar = () => {
   const [showUserMenu, setShowUserMenu] = useState(false);
@@ -38,9 +39,13 @@ const Navbar = () => {
     setShowUserMenu(false);
   };
 
-  const confirmLogout = () => {
+  const confirmLogout = async () => {
     localStorage.removeItem("token");
-    queryClient.setQueryData(["authUser"], { user: null });
+    try {
+      await disconnectStreamUser();
+    } catch {}
+    await queryClient.cancelQueries();
+    queryClient.clear();
     toast.success("Logged out successfully");
     setShowLogoutModal(false);
     navigate("/login");
@@ -62,7 +67,6 @@ const Navbar = () => {
           className="bg-transparent border-none outline-none w-full text-white placeholder-white/40 text-sm"
         />
       </div>
-
 
       <div className="flex items-center space-x-2 sm:space-x-3">
         {/* <button className="w-9 h-9 rounded-full bg-white/10 border border-white/10 flex items-center justify-center text-white/70 hover:text-white hover:bg-white/20 transition-colors">
@@ -148,7 +152,6 @@ const Navbar = () => {
           )}
         </div>
       </div>
-
 
       <ConfirmationModal
         isOpen={showLogoutModal}

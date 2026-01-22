@@ -12,7 +12,7 @@ import {
   MessageInput,
   LoadingIndicator,
 } from "stream-chat-react";
-import { SafeMessageInput } from "../components/chat/SafeMessageInput";
+import { FraudDetectionMessageInput } from "../components/chat/FraudDetectionMessageInput";
 import { FaVideo, FaCopy, FaTimes } from "react-icons/fa";
 import "stream-chat-react/dist/css/v2/index.css";
 import toast from "react-hot-toast";
@@ -54,7 +54,7 @@ const ChatPage = () => {
             name: authUser.fullName,
             image: authUser.profilePic,
           },
-          streamTokenData.token
+          streamTokenData.token,
         );
 
         if (!mounted) return;
@@ -195,8 +195,8 @@ const ChatPage = () => {
             </div>
 
             <MessageList />
-            {/* Use SafeMessageInput for pre-send fraud detection */}
-            <SafeMessageInput />
+            {/* Pre-send fraud detection enabled */}
+            <FraudDetectionMessageInput />
           </Window>
         </Channel>
       </Chat>

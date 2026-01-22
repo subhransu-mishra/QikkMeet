@@ -39,14 +39,15 @@ const SignUpPage = () => {
       });
       return response.data;
     },
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       toast.success("Account created successfully!");
       localStorage.setItem("token", data.token);
 
-      // Update the auth query cache with the new user data
+      // Clear all cached queries to avoid showing previous user's data
+      await queryClient.cancelQueries();
+      queryClient.clear();
+      // Seed fresh auth user
       queryClient.setQueryData(["authUser"], { user: data.user });
-
-      // Navigate to onboarding
       navigate("/onboarding");
     },
     onError: (error) => {
