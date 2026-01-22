@@ -8,10 +8,11 @@ import {
   FaLock,
   FaCheck,
 } from "react-icons/fa";
+import { FcGoogle } from "react-icons/fc";
+import { FaFacebook, FaApple } from "react-icons/fa";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { axiosInstance } from "../lib/axios";
 import toast from "react-hot-toast";
-import { SkewLoader } from "react-spinners";
 import { motion } from "framer-motion";
 
 const SignUpPage = () => {
@@ -83,219 +84,256 @@ const SignUpPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-black flex items-center justify-center px-4 py-8 text-white">
-      <div className="w-full max-w-6xl flex items-center justify-center">
+    <div className="min-h-screen relative flex items-center justify-center px-4 py-8 text-white overflow-hidden">
+      {/* Animated Dark Gradient Background */}
+      <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-black to-gray-800">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_50%,rgba(120,119,198,0.15),transparent_50%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_80%,rgba(255,255,255,0.05),transparent_50%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_40%_20%,rgba(60,60,60,0.1),transparent_40%)]" />
+      </div>
+
+      {/* Backdrop Blur Layer */}
+      <div className="absolute inset-0 backdrop-blur-3xl" />
+
+      <div className="relative z-10 w-full max-w-6xl">
         <motion.div
-          initial={{ opacity: 0, y: 12 }}
+          initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.25 }}
-          className="w-full lg:w-1/2 xl:w-2/5"
+          transition={{ duration: 0.5, ease: "easeOut" }}
+          className="flex flex-col lg:flex-row items-center justify-center gap-8"
         >
-          <div className="bg-[#0a0a0a] border border-white/10 rounded-2xl shadow-2xl p-8">
-            {/* Header */}
-            <div className="text-center mb-8">
-              <h2 className="text-3xl font-bold text-white mb-2">
-                Create Account
-              </h2>
-              <p className="text-gray-400">Join us for an amazing experience</p>
-            </div>
-
-            {/* Form */}
-            <form onSubmit={handleSubmit} className="space-y-6">
-              {/* Full Name */}
-              <div className="relative">
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Full Name
-                </label>
-                <div className="relative">
-                  <FaUser className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                  <input
-                    type="text"
-                    name="fullName"
-                    value={signupData.fullName}
-                    onChange={handleInputChange}
-                    className="w-full pl-10 pr-4 py-3 bg-primary border border-gray-700 rounded-2xl focus:ring-2 focus:ring-secondary focus:border-transparent transition-all duration-300 outline-none"
-                    placeholder="Enter your full name"
-                    required
-                  />
+          {/* Left Side - Signup Form */}
+          <div className="w-full lg:w-1/2 max-w-md">
+            <div className="bg-black/40 backdrop-blur-xl border border-white/10 rounded-3xl shadow-2xl p-8 lg:p-10">
+              {/* Header */}
+              <div className="text-center mb-8">
+                <div className="inline-flex items-center justify-center w-14 h-14 bg-gradient-to-br from-white/10 to-white/5 rounded-xl mb-4 backdrop-blur-sm">
+                  <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+                  </svg>
                 </div>
+                <h2 className="text-3xl lg:text-4xl font-bold text-white mb-2 tracking-tight">
+                  Create Account
+                </h2>
+                <p className="text-gray-400 text-sm">Join us for an amazing experience</p>
               </div>
 
-              {/* Email */}
-              <div className="relative">
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Email Address
-                </label>
+              {/* Form */}
+              <form onSubmit={handleSubmit} className="space-y-4">
+                {/* Full Name */}
                 <div className="relative">
-                  <FaEnvelope className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                  <input
-                    type="email"
-                    name="email"
-                    value={signupData.email}
-                    onChange={handleInputChange}
-                    className="w-full pl-10 pr-4 py-3 bg-primary border border-gray-700 rounded-2xl focus:ring-2 focus:ring-secondary focus:border-transparent transition-all duration-300 outline-none"
-                    placeholder="Enter your email"
-                    required
-                  />
-                </div>
-              </div>
-
-              {/* Password */}
-              <div className="relative">
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Password
-                </label>
-                <div className="relative">
-                  <FaLock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                  <input
-                    type={showPassword ? "text" : "password"}
-                    name="password"
-                    value={signupData.password}
-                    onChange={handleInputChange}
-                    className="w-full pl-10 pr-12 py-3 bg-primary border border-gray-700 rounded-2xl focus:ring-2 focus:ring-secondary focus:border-transparent transition-all duration-300 outline-none"
-                    placeholder="Enter your password"
-                    required
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-secondary transition-colors duration-200"
-                  >
-                    {showPassword ? <FaEyeSlash /> : <FaEye />}
-                  </button>
-                </div>
-              </div>
-
-              {/* Confirm Password */}
-              <div className="relative">
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Confirm Password
-                </label>
-                <div className="relative">
-                  <FaLock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                  <input
-                    type={showConfirmPassword ? "text" : "password"}
-                    name="confirmPassword"
-                    value={signupData.confirmPassword}
-                    onChange={handleInputChange}
-                    className="w-full pl-10 pr-12 py-3 bg-primary border border-gray-700 rounded-2xl focus:ring-2 focus:ring-secondary focus:border-transparent transition-all duration-300 outline-none"
-                    placeholder="Confirm your password"
-                    required
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-secondary transition-colors duration-200"
-                  >
-                    {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
-                  </button>
-                </div>
-              </div>
-
-              {/* Terms and Conditions (FIXED double toggle issue) */}
-              <div className="space-y-2">
-                <label
-                  htmlFor="agreeTerms"
-                  className="flex items-center gap-3 cursor-pointer select-none"
-                >
-                  <input
-                    id="agreeTerms"
-                    type="checkbox"
-                    checked={agreeTerms}
-                    onChange={(e) => {
-                      setAgreeTerms(e.target.checked);
-                      setTermsError(false);
-                    }}
-                    className="sr-only"
-                  />
-                  <span
-                    className={`flex items-center justify-center w-6 h-6 rounded-md border-2 transition-all duration-200
-                      ${
-                        agreeTerms
-                          ? "bg-secondary border-secondary"
-                          : "border-gray-600"
-                      }
-                      ${
-                        termsError && !agreeTerms
-                          ? "ring-2 ring-red-500 ring-offset-2 ring-offset-primary"
-                          : ""
-                      }`}
-                  >
-                    <FaCheck
-                      className={`text-white text-sm transition-opacity duration-200 ${
-                        agreeTerms ? "opacity-100" : "opacity-0"
-                      }`}
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    Full Name
+                  </label>
+                  <div className="relative">
+                    <FaUser className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                    <input
+                      type="text"
+                      name="fullName"
+                      value={signupData.fullName}
+                      onChange={handleInputChange}
+                      className="w-full pl-10 pr-4 py-3 bg-white/5 border border-white/10 rounded-xl focus:ring-2 focus:ring-white/20 focus:border-white/30 focus:bg-white/10 transition-all duration-300 outline-none text-white placeholder-gray-500"
+                      placeholder="Enter your full name"
+                      required
                     />
-                  </span>
-                  <span className="text-sm text-gray-400">
-                    I agree to all{" "}
-                    <span className="text-secondary hover:underline">
-                      terms & conditions
-                    </span>
-                  </span>
-                </label>
-                {termsError && !agreeTerms && (
-                  <p className="text-xs text-red-400">
-                    You must accept the terms to continue.
-                  </p>
-                )}
-              </div>
-
-              {/* Submit Button */}
-              <button
-                type="submit"
-                disabled={isLoading}
-                className={`w-full py-3.5 px-8 rounded-full font-semibold transition-all duration-300 
-                  ${
-                    isLoading
-                      ? "bg-white/20 text-white cursor-not-allowed"
-                      : "bg-white text-black hover:bg-white/90 hover:shadow-lg hover:shadow-white/20 cursor-pointer"
-                  }
-                  shadow-lg`}
-              >
-                {isLoading ? (
-                  <div className="flex items-center justify-center gap-3">
-                    <SkewLoader color="#ffffff" size={10} />
-                    <span className="text-white">Creating Account...</span>
                   </div>
-                ) : (
-                  "Sign Up"
-                )}
-              </button>
-            </form>
+                </div>
+
+                {/* Email */}
+                <div className="relative">
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    Email
+                  </label>
+                  <div className="relative">
+                    <FaEnvelope className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                    <input
+                      type="email"
+                      name="email"
+                      value={signupData.email}
+                      onChange={handleInputChange}
+                      className="w-full pl-10 pr-4 py-3 bg-white/5 border border-white/10 rounded-xl focus:ring-2 focus:ring-white/20 focus:border-white/30 focus:bg-white/10 transition-all duration-300 outline-none text-white placeholder-gray-500"
+                      placeholder="Enter your email"
+                      required
+                    />
+                  </div>
+                </div>
+
+                {/* Password */}
+                <div className="relative">
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    Password
+                  </label>
+                  <div className="relative">
+                    <FaLock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      name="password"
+                      value={signupData.password}
+                      onChange={handleInputChange}
+                      className="w-full pl-10 pr-12 py-3 bg-white/5 border border-white/10 rounded-xl focus:ring-2 focus:ring-white/20 focus:border-white/30 focus:bg-white/10 transition-all duration-300 outline-none text-white placeholder-gray-500"
+                      placeholder="Enter your password"
+                      required
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white transition-colors duration-200"
+                    >
+                      {showPassword ? <FaEyeSlash /> : <FaEye />}
+                    </button>
+                  </div>
+                </div>
+
+                {/* Confirm Password */}
+                <div className="relative">
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    Confirm Password
+                  </label>
+                  <div className="relative">
+                    <FaLock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                    <input
+                      type={showConfirmPassword ? "text" : "password"}
+                      name="confirmPassword"
+                      value={signupData.confirmPassword}
+                      onChange={handleInputChange}
+                      className="w-full pl-10 pr-12 py-3 bg-white/5 border border-white/10 rounded-xl focus:ring-2 focus:ring-white/20 focus:border-white/30 focus:bg-white/10 transition-all duration-300 outline-none text-white placeholder-gray-500"
+                      placeholder="Confirm your password"
+                      required
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white transition-colors duration-200"
+                    >
+                      {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
+                    </button>
+                  </div>
+                </div>
+
+                {/* Terms and Conditions */}
+                <div className="space-y-2">
+                  <label
+                    htmlFor="agreeTerms"
+                    className="flex items-center gap-3 cursor-pointer select-none"
+                  >
+                    <input
+                      id="agreeTerms"
+                      type="checkbox"
+                      checked={agreeTerms}
+                      onChange={(e) => {
+                        setAgreeTerms(e.target.checked);
+                        setTermsError(false);
+                      }}
+                      className="sr-only"
+                    />
+                    <span
+                      className={`flex items-center justify-center w-5 h-5 rounded-md border-2 transition-all duration-200
+                        ${
+                          agreeTerms
+                            ? "bg-white border-white"
+                            : "border-white/30"
+                        }
+                        ${
+                          termsError && !agreeTerms
+                            ? "ring-2 ring-red-500 ring-offset-2 ring-offset-black/40"
+                            : ""
+                        }`}
+                    >
+                      <FaCheck
+                        className={`text-black text-xs transition-opacity duration-200 ${
+                          agreeTerms ? "opacity-100" : "opacity-0"
+                        }`}
+                      />
+                    </span>
+                    <span className="text-xs text-gray-400">
+                      I agree to all{" "}
+                      <span className="text-white hover:underline cursor-pointer">
+                        terms & conditions
+                      </span>
+                    </span>
+                  </label>
+                  {termsError && !agreeTerms && (
+                    <p className="text-xs text-red-400 ml-8">
+                      You must accept the terms to continue.
+                    </p>
+                  )}
+                </div>
+
+                {/* Submit Button */}
+                <button
+                  type="submit"
+                  disabled={isLoading}
+                  className={`w-full py-3.5 px-8 rounded-xl font-semibold transition-all duration-300 
+                    ${
+                      isLoading
+                        ? "bg-white/20 text-white/60 cursor-not-allowed"
+                        : "bg-white text-black hover:bg-white/90 hover:scale-[1.02] hover:shadow-lg hover:shadow-white/20 cursor-pointer"
+                    }
+                    shadow-lg flex items-center justify-center gap-2`}
+                >
+                  {isLoading ? (
+                    <>
+                      <span className="inline-block w-4 h-4 border-2 border-black/30 border-t-black rounded-full animate-spin" />
+                      <span>Creating Account...</span>
+                    </>
+                  ) : (
+                    "Sign Up"
+                  )}
+                </button>
+              </form>
 
             {/* Footer */}
-            <div className="mt-8 text-center">
-              <p className="text-gray-400">
+            <div className="mt-6 text-center">
+              <p className="text-gray-400 text-sm">
                 Already have an account?{" "}
                 <Link
                   to="/login"
-                  className="text-secondary hover:underline font-semibold transition-colors duration-200"
+                  className="text-white cursor-pointer hover:underline font-medium transition-colors duration-200"
                 >
-                  Sign In
+                  Sign in
                 </Link>
               </p>
             </div>
           </div>
-        </motion.div>
-
-        {/* Right Side Image - Hidden on mobile */}
-        <div className="hidden lg:flex lg:w-1/2 xl:w-3/5 items-center justify-center pl-8">
-          <div className="relative">
-            <div className="w-96 h-96 bg-gradient-to-br from-secondary to-purple-700 rounded-full animate-float opacity-20 absolute -top-10 -left-10"></div>
-            <div className="relative z-10">
-              <img
-                src="https://images.unsplash.com/photo-1551434678-e076c223a692?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80"
-                alt="Video Chat Illustration"
-                className="w-full max-w-lg rounded-2xl shadow-2xl animate-float"
-              />
-            </div>
-            <div
-              className="w-32 h-32 bg-gradient-to-br from-secondary to-purple-700 rounded-full animate-float opacity-30 absolute -bottom-5 -right-5"
-              style={{ animationDelay: "1s" }}
-            ></div>
           </div>
-        </div>
+          {/* Divider - Vertical on desktop, horizontal on mobile */}
+          <div className="hidden lg:block w-px h-96 bg-gradient-to-b from-transparent via-white/20 to-transparent"></div>
+          <div className="lg:hidden w-full flex items-center my-6">
+            <div className="flex-1 border-t border-white/20"></div>
+            <span className="px-6 text-gray-400 text-sm font-medium">or</span>
+            <div className="flex-1 border-t border-white/20"></div>
+          </div>
+
+          {/* Right Side - Social Login Section */}
+          <div className="w-full lg:w-1/2 max-w-md">
+            <div className="bg-black/40 backdrop-blur-xl border border-white/10 rounded-3xl shadow-2xl p-8 lg:p-10">
+              <h3 className="text-2xl font-semibold text-white mb-6 text-center">Sign up with</h3>
+              <div className="space-y-4">
+                <button
+                  type="button"
+                  className="w-full flex items-center justify-center gap-3 py-3.5 px-6 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 rounded-xl transition-all duration-300 cursor-pointer group"
+                >
+                  <FcGoogle className="w-6 h-6" />
+                  <span className="text-white font-medium group-hover:text-white/90">Continue with Google</span>
+                </button>
+                <button
+                  type="button"
+                  className="w-full flex items-center justify-center gap-3 py-3.5 px-6 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 rounded-xl transition-all duration-300 cursor-pointer group"
+                >
+                  <FaFacebook className="w-6 h-6 text-[#1877F2]" />
+                  <span className="text-white font-medium group-hover:text-white/90">Continue with Facebook</span>
+                </button>
+                <button
+                  type="button"
+                  className="w-full flex items-center justify-center gap-3 py-3.5 px-6 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 rounded-xl transition-all duration-300 cursor-pointer group"
+                >
+                  <FaApple className="w-6 h-6 text-white" />
+                  <span className="text-white font-medium group-hover:text-white/90">Continue with Apple</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </motion.div>
       </div>
     </div>
   );

@@ -21,27 +21,30 @@ export const connectStreamUser = async (user, token) => {
   const client = getStreamChatClient();
   if (!client) return null;
 
+  // Ensure user ID is a string
+  const userId = String(user.id);
+
   // If already connected as the same user, return existing client
-  if (client.userID === user.id && currentUserId === user.id) {
+  if (client.userID === userId && currentUserId === userId) {
     return client;
   }
 
   // Disconnect previous user if different
-  if (client.userID && client.userID !== user.id) {
+  if (client.userID && client.userID !== userId) {
     await client.disconnectUser();
   }
 
   // Connect new user
   await client.connectUser(
     {
-      id: user.id,
+      id: userId,
       name: user.name,
       image: user.image,
     },
     token
   );
 
-  currentUserId = user.id;
+  currentUserId = userId;
   return client;
 };
 

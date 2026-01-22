@@ -9,7 +9,6 @@ const generateToken = (id) => {
   });
 };
 
-
 export const signup = async (req, res) => {
   const { email, fullName, password } = req.body;
   try {
@@ -37,10 +36,9 @@ export const signup = async (req, res) => {
       return res.status(400).json({ message: "Email already exists" });
     }
 
-   
     const generateAvatar = () => {
       const randomNum = Math.floor(Math.random() * 100) + 1;
-     
+
       const avatarServices = [
         `https://api.dicebear.com/7.x/avataaars/svg?seed=${email}`,
         `https://ui-avatars.com/api/?name=${encodeURIComponent(
@@ -51,12 +49,11 @@ export const signup = async (req, res) => {
           email
         )}`,
       ];
-      return avatarServices[0]; 
+      return avatarServices[0];
     };
 
     const randomAvatar = generateAvatar();
 
-   
     const newUser = new User({
       email,
       fullName,
@@ -66,7 +63,7 @@ export const signup = async (req, res) => {
     await newUser.save();
     try {
       await upsertStreamUser({
-        id: newUser._id,
+        id: newUser._id.toString(),
         name: newUser.fullName,
         image: newUser.profilePic || "",
       });
@@ -75,9 +72,8 @@ export const signup = async (req, res) => {
       console.log("Error creating user to Stream:", error);
     }
 
-    
     const token = generateToken(newUser._id);
-    
+
     res.status(201).json({
       message: "User created successfully",
       token,
@@ -97,7 +93,6 @@ export const signup = async (req, res) => {
   }
 };
 
-
 export const login = async (req, res) => {
   const { email, password } = req.body;
 
@@ -116,6 +111,19 @@ export const login = async (req, res) => {
     const isMatch = await user.comparePassword(password);
     if (!isMatch) {
       return res.status(401).json({ message: "Invalid credentials" });
+    }
+
+    // Sync user with Stream Chat on every login
+    try {
+      await upsertStreamUser({
+        id: user._id.toString(),
+        name: user.fullName,
+        image: user.profilePic || "",
+      });
+      console.log("Stream user synced on login:", user.fullName);
+    } catch (streamError) {
+      console.error("Error syncing user to Stream on login:", streamError);
+      // Don't block login if Stream sync fails
     }
 
     const token = generateToken(user._id);
@@ -140,17 +148,14 @@ export const login = async (req, res) => {
   }
 };
 
-
 export const logout = async (req, res) => {
   try {
-    
     res.status(200).json({ message: "User logged out successfully" });
   } catch (error) {
     console.error("Error in logout:", error);
     res.status(500).json({ message: "Error logging out user", error });
   }
 };
-
 
 export const getMe = async (req, res) => {
   try {
@@ -185,7 +190,6 @@ export const getMe = async (req, res) => {
   }
 };
 
-
 export const onboarding = async (req, res) => {
   try {
     const { fullName, bio, location, profilePic } = req.body;
@@ -208,6 +212,19 @@ export const onboarding = async (req, res) => {
       },
       { new: true }
     ).select("-password");
+
+    // Sync updated profile with Stream Chat
+    try {
+      await upsertStreamUser({
+        id: user._id.toString(),
+        name: user.fullName,
+        image: user.profilePic || "",
+      });
+      console.log("Stream user updated after onboarding:", user.fullName);
+    } catch (streamError) {
+      console.error("Error updating Stream user on onboarding:", streamError);
+      // Don't block onboarding if Stream sync fails
+    }
 
     res.status(200).json({
       success: true,

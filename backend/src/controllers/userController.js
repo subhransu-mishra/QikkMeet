@@ -1,5 +1,7 @@
 import User from "../models/User.js";
 import FriendRequest from "../models/FriendRequest.js";
+import { upsertStreamUser } from "../lib/stream.js";
+
 export async function getRecommendedUsers(req, res) {
   try {
     const currentUserId = req.user.id;
@@ -47,7 +49,6 @@ export async function sendFriendRequest(req, res) {
     const myId = req.user.id;
     const { id: recipientId } = req.params;
 
-    
     if (myId === recipientId) {
       return res
         .status(400)
@@ -91,7 +92,10 @@ export async function sendFriendRequest(req, res) {
 export async function acceptFriendRequest(req, res) {
   try {
     const { id: requestId } = req.params;
-    const friendRequest = await FriendRequest.findById(requestId);
+    const friendRequest = await FriendRequest.findById(requestId).populate(
+      "sender",
+      "fullName profilePic"
+    );
 
     if (!friendRequest) {
       return res.status(404).json({ message: "Friend request not found" });
@@ -110,11 +114,33 @@ export async function acceptFriendRequest(req, res) {
     // Add each user to the other's friends list
 
     await User.findByIdAndUpdate(req.user.id, {
-      $addToSet: { friends: friendRequest.sender },
+      $addToSet: { friends: friendRequest.sender._id },
     });
-    await User.findByIdAndUpdate(friendRequest.sender, {
+    await User.findByIdAndUpdate(friendRequest.sender._id, {
       $addToSet: { friends: friendRequest.recipient },
     });
+
+    // Sync both users to Stream Chat so they can message each other
+    try {
+      // Sync the sender (the person who sent the request)
+      await upsertStreamUser({
+        id: friendRequest.sender._id.toString(),
+        name: friendRequest.sender.fullName,
+        image: friendRequest.sender.profilePic || "",
+      });
+
+      // Sync the recipient (current user who is accepting)
+      await upsertStreamUser({
+        id: req.user._id.toString(),
+        name: req.user.fullName,
+        image: req.user.profilePic || "",
+      });
+
+      console.log("Both users synced to Stream after friend request accepted");
+    } catch (streamError) {
+      console.error("Error syncing users to Stream:", streamError);
+      // Don't block the friend request acceptance if Stream sync fails
+    }
 
     res.status(200).json({ message: "Friend request accepted" });
   } catch (error) {

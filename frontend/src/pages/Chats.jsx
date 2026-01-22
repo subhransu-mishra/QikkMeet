@@ -73,10 +73,11 @@ const Chats = () => {
       const sc = StreamChat.getInstance(apiKey);
 
       // Connect only if not already connected as this user
-      if (sc.userID !== authUser.id) {
+      const myUserId = String(authUser.id);
+      if (sc.userID !== myUserId) {
         await sc.connectUser(
           {
-            id: authUser.id,
+            id: myUserId,
             name: authUser.fullName,
             image: authUser.profilePic,
           },
@@ -87,7 +88,7 @@ const Chats = () => {
       if (!isActive) return;
       setClient(sc);
 
-      const filters = { type: "messaging", members: { $in: [authUser.id] } };
+      const filters = { type: "messaging", members: { $in: [myUserId] } };
       const sort = { last_message_at: -1 };
       const channels = await sc.queryChannels(filters, sort, {
         watch: false,
@@ -100,7 +101,11 @@ const Chats = () => {
         const memberIds = Object.values(ch.state.members || {}).map(
           (m) => m.user_id
         );
-        const otherId = memberIds.find((m) => m !== authUser.id);
+        const otherId = memberIds.find((m) => m !== myUserId);
+
+        // Skip if no other member found
+        if (!otherId) return;
+
         const lastMsg =
           ch.state.messages && ch.state.messages.length
             ? ch.state.messages[ch.state.messages.length - 1]

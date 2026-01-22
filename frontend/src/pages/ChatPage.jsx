@@ -50,7 +50,7 @@ const ChatPage = () => {
       try {
         const client = await connectStreamUser(
           {
-            id: authUser.id,
+            id: String(authUser.id), // Ensure ID is a string
             name: authUser.fullName,
             image: authUser.profilePic,
           },
@@ -80,8 +80,8 @@ const ChatPage = () => {
       return;
     }
 
-    // Ensure unique members only
-    const members = [authUser.id, chatWithUserId];
+    // Ensure unique members only - convert to strings
+    const members = [String(authUser.id), String(chatWithUserId)];
     const uniqueMembers = [...new Set(members)];
 
     // Double check we have at least 2 members
@@ -90,6 +90,7 @@ const ChatPage = () => {
       return;
     }
 
+    // Create/get channel with members - Stream handles deduplication
     const channel = chatClient.channel("messaging", {
       members: uniqueMembers,
     });
@@ -110,7 +111,6 @@ const ChatPage = () => {
       channel.stopWatching().catch(() => {});
     };
   }, [chatClient, chatWithUserId, authUser, navigate]);
-
 
   if (authLoading || tokenLoading) {
     return <LoadingIndicator />;
@@ -134,7 +134,7 @@ const ChatPage = () => {
     channel?.state?.members &&
     Object.values(channel.state.members)
       .map((m) => m.user)
-      .find((u) => u?.id !== authUser?.id);
+      .find((u) => u?.id !== String(authUser?.id));
 
   const handleStartCall = () => {
     const callId = `call-${[authUser.id, chatWithUserId].sort().join("-")}`;
