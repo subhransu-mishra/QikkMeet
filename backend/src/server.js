@@ -39,11 +39,26 @@ app.use(compression());
 // CORS with environment-aware origins
 const isProd = process.env.NODE_ENV === "production";
 const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:5173";
+
+// In production, allow specific frontend domain
+const allowedOrigins = isProd
+  ? ["https://qikkmeet.onrender.com", FRONTEND_URL]
+  : [FRONTEND_URL, "http://localhost:5173"];
+
 app.use(
   cors({
-    origin: isProd ? true : [FRONTEND_URL, "http://localhost:5173"],
+    origin: (origin, callback) => {
+      // Allow requests with no origin (mobile apps, curl, etc)
+      if (!origin) return callback(null, true);
+
+      if (allowedOrigins.indexOf(origin) !== -1 || !isProd) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
     credentials: true,
-  })
+  }),
 );
 
 app.use(cookieParser());
@@ -76,7 +91,7 @@ app.use(
       req.rawBody = buf;
     },
   }),
-  webhookRoutes
+  webhookRoutes,
 );
 
 // Favicon (avoid 404 noise)
@@ -116,7 +131,7 @@ const startServer = async () => {
     const dbStatus = await connectDB();
     if (!dbStatus?.connected) {
       console.warn(
-        "⚠️ DB not connected. API will run with limited functionality."
+        "⚠️ DB not connected. API will run with limited functionality.",
       );
     }
 

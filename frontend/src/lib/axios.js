@@ -1,19 +1,18 @@
 import axios from "axios";
 
 // Resolve backend base URL:
-// - Use VITE_API_BASE if provided
+// - Use VITE_API_BASE if provided (set in .env.production for production)
 // - In dev, default to http://localhost:5001/api
-// - In production, default to /api (same origin, served by backend)
+// - In production, MUST set VITE_API_BASE in .env.production to backend URL
 const isProd = import.meta.env.MODE === "production";
 const envBase = import.meta.env.VITE_API_BASE;
 const defaultDevBase = "http://localhost:5001/api";
-const defaultProdBase = "/api";
 
+// In production, VITE_API_BASE must be set or this will fail
 export const axiosInstance = axios.create({
-  baseURL: envBase || (isProd ? defaultProdBase : defaultDevBase),
-  withCredentials: true, 
+  baseURL: envBase || defaultDevBase,
+  withCredentials: true,
 });
-
 
 axiosInstance.interceptors.request.use(
   (config) => {
@@ -23,9 +22,8 @@ axiosInstance.interceptors.request.use(
     }
     return config;
   },
-  (error) => Promise.reject(error)
+  (error) => Promise.reject(error),
 );
-
 
 axiosInstance.interceptors.response.use(
   (response) => response,
@@ -37,5 +35,5 @@ axiosInstance.interceptors.response.use(
       }
     }
     return Promise.reject(error);
-  }
+  },
 );
