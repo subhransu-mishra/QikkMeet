@@ -50,7 +50,7 @@ const HomePage = () => {
     isLoading: friendsLoading,
     isError: friendsError,
   } = useQuery({
-    queryKey: ["friends"],
+    queryKey: ["friends", authUser?.id],
     queryFn: async () => {
       const res = await axiosInstance.get("/users/friends");
       return res.data; // array of friends: [{ _id, fullName, profilePic }]
@@ -63,7 +63,7 @@ const HomePage = () => {
     isLoading: recLoading,
     isError: recError,
   } = useQuery({
-    queryKey: ["recommendedUsers"],
+    queryKey: ["recommendedUsers", authUser?.id],
     queryFn: async () => {
       const res = await axiosInstance.get("/users");
       return res.data; // array of users: [{ _id, fullName, profilePic, ... }]
@@ -72,7 +72,7 @@ const HomePage = () => {
 
   // Fetch outgoing friend requests to disable "Connect" on already requested
   const { data: outgoingData } = useQuery({
-    queryKey: ["outgoingFriendRequests"],
+    queryKey: ["outgoingFriendRequests", authUser?.id],
     queryFn: async () => {
       const res = await axiosInstance.get("/users/outgoing-friend-requests");
       return res.data; // [{ _id, recipient: { _id, fullName, profilePic } }]

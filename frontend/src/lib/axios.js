@@ -29,9 +29,14 @@ axiosInstance.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response && error.response.status === 401) {
-      localStorage.removeItem("token");
-      if (window.location.pathname !== "/login") {
-        window.location.href = "/login";
+      const url = error.config?.url || "";
+      // Don't redirect for auth status checks; let callers handle null user
+      const isAuthMe = url.includes("/auth/me");
+      if (!isAuthMe) {
+        localStorage.removeItem("token");
+        if (window.location.pathname !== "/login") {
+          window.location.href = "/login";
+        }
       }
     }
     return Promise.reject(error);

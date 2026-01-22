@@ -26,14 +26,13 @@ const LoginPage = () => {
       });
       return response.data;
     },
-    onSuccess: async (data) => {
+    onSuccess: (data) => {
       toast.success("Login successful!");
+      // Persist token first so subsequent requests are authorized
       localStorage.setItem("token", data.token);
-
-      // Clear all cached queries to avoid showing previous user's data
-      await queryClient.cancelQueries();
+      // Clear any cached data from a previous session
       queryClient.clear();
-      // Seed fresh auth user
+      // Seed auth cache for immediate UI update
       queryClient.setQueryData(["authUser"], { user: data.user });
       navigate("/");
     },
