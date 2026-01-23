@@ -39,16 +39,16 @@ const SignUpPage = () => {
       });
       return response.data;
     },
-    onSuccess: async (data) => {
+    onSuccess: (data) => {
       toast.success("Account created successfully!");
       localStorage.setItem("token", data.token);
-
-      // Clear all cached queries to avoid showing previous user's data
-      await queryClient.cancelQueries();
-      queryClient.clear();
-      // Seed fresh auth user
-      queryClient.setQueryData(["authUser"], { user: data.user });
-      navigate("/onboarding");
+      // Seed fresh auth user (match /auth/me response structure)
+      queryClient.setQueryData(["authUser"], {
+        success: true,
+        user: data.user,
+      });
+      // Navigate after a brief delay to ensure cache is set
+      setTimeout(() => navigate("/onboarding"), 0);
     },
     onError: (error) => {
       const errorMessage =
@@ -264,7 +264,7 @@ const SignUpPage = () => {
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className={`w-full py-3.5 px-8 rounded-xl font-semibold transition-all duration-300 
+                  className={`w-full py-3.5 px-8 rounded-xl font-semibold transition-all duration-300
                     ${
                       isLoading
                         ? "bg-white/20 text-white/60 cursor-not-allowed"

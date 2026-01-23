@@ -238,8 +238,8 @@ const HomePage = () => {
               } else if (isPendingThis) {
                 buttonContent = (
                   <span className="flex items-center gap-2">
-                    <LoadingSpinner size="sm" showText={false} />
-                    Sending
+                    <span className="inline-block w-4 h-4 border-2 border-black/30 border-t-black rounded-full animate-spin" />
+                    Sending...
                   </span>
                 );
               } else {

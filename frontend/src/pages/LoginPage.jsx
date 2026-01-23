@@ -30,11 +30,13 @@ const LoginPage = () => {
       toast.success("Login successful!");
       // Persist token first so subsequent requests are authorized
       localStorage.setItem("token", data.token);
-      // Clear any cached data from a previous session
-      queryClient.clear();
-      // Seed auth cache for immediate UI update
-      queryClient.setQueryData(["authUser"], { user: data.user });
-      navigate("/");
+      // Seed auth cache for immediate UI update (match /auth/me response structure)
+      queryClient.setQueryData(["authUser"], {
+        success: true,
+        user: data.user,
+      });
+      // Navigate after a brief delay to ensure cache is set
+      setTimeout(() => navigate("/"), 0);
     },
     onError: (error) => {
       const errorMessage =

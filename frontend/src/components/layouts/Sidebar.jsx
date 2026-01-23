@@ -26,14 +26,13 @@ const Sidebar = () => {
 
   const handleLogout = () => {
     localStorage.removeItem("token");
-    queryClient.setQueryData(["authUser"], { user: null });
+    queryClient.setQueryData(["authUser"], { success: false, user: null });
     toast.success("Logged out successfully");
     navigate("/login");
   };
 
   return (
     <>
-    
       <div className="hidden lg:flex w-64 bg-black h-full flex-col shadow-lg z-10 border-r border-white/10">
         {/* Logo */}
         <div className="h-16 flex items-center justify-center px-4 border-b border-white/10">
@@ -42,7 +41,6 @@ const Sidebar = () => {
           </Link>
         </div>
 
-        
         <div className="flex-1 py-6">
           <ul className="space-y-3 px-3">
             {sidebarItems.map((item) => {
@@ -74,7 +72,6 @@ const Sidebar = () => {
           </ul>
         </div>
 
-        
         <div className="p-4 mt-auto border-t border-white/10">
           <button
             onClick={handleLogout}
@@ -86,7 +83,6 @@ const Sidebar = () => {
         </div>
       </div>
 
-      
       <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-black border-t border-white/10 z-50 safe-area-inset-bottom">
         <div className="flex items-center justify-around px-2 py-3">
           {sidebarItems.map((item) => {

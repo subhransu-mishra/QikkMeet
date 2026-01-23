@@ -95,8 +95,11 @@ const OnBoardingPage = () => {
     onSuccess: (data) => {
       toast.success("Onboarding completed successfully!");
 
-      // Update the auth query cache with the updated user data
-      queryClient.setQueryData(["authUser"], { user: data.user });
+      // Update the auth query cache with the updated user data (match /auth/me response structure)
+      queryClient.setQueryData(["authUser"], {
+        success: true,
+        user: data.user,
+      });
 
       navigate("/");
     },
@@ -275,17 +278,16 @@ const OnBoardingPage = () => {
             <button
               type="submit"
               disabled={isLoading || loadingCities}
-              className={`w-full py-3.5 px-8 rounded-full font-semibold transition-all duration-300 cursor-pointer
+              className={`w-full py-3.5 px-8 rounded-full font-semibold transition-all duration-300
                 ${
                   isLoading || loadingCities
-                    ? "bg-white/10 text-white/60 cursor-not-allowed"
-                    : "bg-white text-black hover:bg-white/90"
+                    ? "bg-white/20 text-white/60 cursor-not-allowed"
+                    : "bg-white text-black hover:bg-white/90 cursor-pointer"
                 } shadow-lg flex items-center justify-center gap-2`}
             >
               {isLoading ? (
                 <>
-                  {/* inline modern spinner */}
-                  <span className="inline-block w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  <span className="inline-block w-4 h-4 border-2 border-black/30 border-t-black rounded-full animate-spin" />
                   <span>Completing Onboarding...</span>
                 </>
               ) : (
